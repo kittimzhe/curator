@@ -21,6 +21,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
+# 启动时加载项目根 .env(如存在),自动注入 CURATOR_LLM_API_KEY 等
+try:
+    from dotenv import load_dotenv
+
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env", override=False)
+except ImportError:
+    pass
+
 from . import gardener
 from . import llm
 from . import pipeline

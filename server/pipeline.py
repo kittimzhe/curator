@@ -71,7 +71,9 @@ def classify(state: State) -> dict:
     data = llm.parse_json(
         llm.ask_llm(
             "你是分类员(输出 JSON)。判断内容值得深加工(deep)还是稍后读(read_later),"
-            '并给 1-3 个标签。输出 {"depth": "deep|read_later", "tags": [...]}',
+            "并给 1-3 个标签。注意:包含强断言、对比结论、数字/百分比的内容必须 deep"
+            "(需要质疑员审查);纯链接、简短通知类才 read_later。"
+            '输出 {"depth": "deep|read_later", "tags": [...]}',
             f"标题:{state['title']}\n内容:\n{state['content'][:600]}",
             expect_json=True,
         )
@@ -155,9 +157,10 @@ def assemble(state: State) -> dict:
         lines += ["## 关联笔记"]
         lines += [f"- [[{c.replace('.md', '')}]] — {r}" for c, r in zip(state["connections"], state.get("reasons", []))]
         lines.append("")
-    verdict_text = {"pass": "✅ 质疑员审查通过", "questioned": f"⚠️ 质疑员存疑:{state.get('comment', '')}"}.get(
-        state.get("verdict", ""), ""
-    )
+    verdict_text = {
+        "pass": "✅ 质疑员审查通过",
+        "questioned": f"⚠️ 质疑员存疑:{state.get('comment', '')}",
+    }.get(state.get("verdict", ""), "—(稍后读快车道,未触发对抗审查)")
     lines += ["## Agent 审查", verdict_text, "", "---", "*由 Curator Agent 流水线生成,经人工审批入库*"]
     markdown = "\n".join(lines)
 
