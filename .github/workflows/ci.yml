@@ -18,6 +18,12 @@ jobs:
           python-version: "3.12"
           cache: pip
 
+      - name: 嵌入模型缓存(先恢复,冒烟测试的检索链路要用)
+        uses: actions/cache@v4
+        with:
+          path: data/chroma_models
+          key: onnx-minilm-${{ runner.os }}
+
       - name: 安装依赖
         run: pip install -r requirements.txt
 
@@ -25,9 +31,3 @@ jobs:
         env:
           CURATOR_LLM_MOCK: "1"
         run: python scripts/smoke_test.py
-
-      - name: 嵌入模型缓存(加速检索检查)
-        uses: actions/cache@v4
-        with:
-          path: data/chroma_models
-          key: onnx-minilm-${{ runner.os }}
