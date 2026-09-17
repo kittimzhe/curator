@@ -9,27 +9,49 @@
 <style>
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
-  .fade-in { animation: fadeIn .4s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px);} to { opacity: 1; transform: none;} }
-  .pulse-dot { animation: pulse 1.5s infinite; }
-  @keyframes pulse { 0%,100% { opacity: 1;} 50% { opacity: .3;} }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  .fade-in { animation: fadeIn .35s ease both; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+
+  .stage-glow { box-shadow: 0 0 0 2px rgba(56,189,248,.35), 0 0 18px rgba(56,189,248,.25); }
+  .stage-done { color: #34d399 !important; border-color: rgba(52,211,153,.5) !important; background: rgba(52,211,153,.08) !important; }
+  .stage-active { animation: stagePulse 1.2s infinite; }
+  @keyframes stagePulse { 0%,100% { opacity: 1 } 50% { opacity: .55 } }
+
+  .brand-grad { background: linear-gradient(120deg, #38bdf8 0%, #818cf8 55%, #c084fc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  .wikilink { color: #7dd3fc; background: rgba(56,189,248,.1); border: 1px solid rgba(56,189,248,.25); border-radius: 4px; padding: 0 4px; font-size: .95em; }
+
+  .toast { animation: toastIn .3s ease both; }
+  @keyframes toastIn { from { opacity: 0; transform: translateX(24px);} to { opacity: 1; transform: none;} }
 </style>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen">
+<body class="bg-slate-950 text-slate-200 min-h-screen antialiased">
+
+<!-- Toast 栈 -->
+<div id="toasts" class="fixed top-4 right-4 z-50 space-y-2 w-72"></div>
 
 <!-- Header -->
-<header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-10">
+<header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur sticky top-0 z-40">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-    <div class="text-2xl">🏛️</div>
+    <div class="text-2xl drop-shadow-[0_0_12px_rgba(56,189,248,.45)]">🏛️</div>
     <div>
-      <h1 class="text-lg font-bold tracking-wide">Curator</h1>
+      <h1 class="text-lg font-bold tracking-wide brand-grad">Curator</h1>
       <p class="text-xs text-slate-500">给你的数字大脑雇一队 AI 图书管理员</p>
     </div>
     <div class="ml-auto flex items-center gap-2 text-xs">
-      <button id="tab-workbench" onclick="switchTab('workbench')" class="px-3 py-1 rounded-full bg-sky-600 text-white font-medium">🛠 工作台</button>
-      <button id="tab-digest" onclick="switchTab('digest')" class="px-3 py-1 rounded-full bg-slate-800 text-slate-400">🌻 简报</button>
-      <span id="llm-badge" class="px-2 py-1 rounded-full bg-slate-800 text-slate-400">…</span>
+      <div class="flex bg-slate-800/60 rounded-full p-0.5">
+        <button id="tab-workbench" onclick="switchTab('workbench')" class="px-3 py-1 rounded-full bg-sky-600 text-white font-medium transition">🛠 工作台</button>
+        <button id="tab-digest" onclick="switchTab('digest')" class="px-3 py-1 rounded-full text-slate-400 hover:text-slate-200 transition">🌻 简报</button>
+      </div>
+      <span id="llm-badge" class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400">…</span>
     </div>
+  </div>
+
+  <!-- 流水线舞台条:内容处理到哪一站,哪一站点亮 -->
+  <div class="max-w-7xl mx-auto px-4 pb-3">
+    <div id="stagebar" class="flex items-center gap-1 overflow-x-auto"></div>
   </div>
 </header>
 
@@ -38,47 +60,48 @@
 
   <!-- Panel 1: Inbox -->
   <section class="space-y-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
       <h2 class="font-semibold mb-3 flex items-center gap-2">📥 收件箱</h2>
       <form id="inbox-form" class="space-y-2">
         <input id="f-title" required maxlength="200" placeholder="标题,如:LangGraph 状态管理详解"
-               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-600">
+               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/40 transition">
         <input id="f-url" placeholder="来源 URL(可选)"
-               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-600">
-        <textarea id="f-content" rows="4" placeholder="粘贴内容……(长内容将触发深加工:摘要+互链+对抗审查)"
-               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-sky-600"></textarea>
-        <button class="w-full bg-sky-600 hover:bg-sky-500 text-white rounded-lg py-2 text-sm font-medium transition">
+               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/40 transition">
+        <textarea id="f-content" rows="4" placeholder="粘贴内容……(长内容将触发深加工:摘要 + 互链 + 对抗审查)"
+               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/40 transition"></textarea>
+        <button class="w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white rounded-lg py-2 text-sm font-medium transition shadow-lg shadow-sky-950/60">
           投递 → Agent 流水线
         </button>
       </form>
     </div>
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-      <h2 class="font-semibold mb-3">🗂️ 队列 <span id="item-count" class="text-xs text-slate-500"></span></h2>
-      <div id="items" class="space-y-2 max-h-72 overflow-y-auto"></div>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
+      <h2 class="font-semibold mb-3">🗂️ 队列 <span id="item-count" class="text-xs text-slate-500 font-normal"></span></h2>
+      <div id="items" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
     </div>
   </section>
 
   <!-- Panel 2: Agent Activity -->
-  <section class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-    <h2 class="font-semibold mb-3 flex items-center gap-2">
+  <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
+    <h2 class="font-semibold mb-1 flex items-center gap-2">
       🤖 Agent 工作台
-      <span class="pulse-dot text-[10px] text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded-full">LIVE</span>
+      <span id="live-dot" class="ml-auto text-[10px] text-emerald-400 bg-emerald-950/80 border border-emerald-900/60 px-2 py-0.5 rounded-full">● LIVE</span>
     </h2>
-    <p class="text-xs text-slate-500 mb-3">🏷️ 分类员 · 📝 摘要员 · 🔗 链接员 · ⚔️ 质疑员 · 📦 组装员</p>
-    <div id="events" class="space-y-2 max-h-[560px] overflow-y-auto pr-1"></div>
+    <div class="flex flex-wrap gap-1.5 mb-3" id="agent-legend"></div>
+    <div id="events" class="relative space-y-2 max-h-[520px] overflow-y-auto pr-1"></div>
   </section>
 
   <!-- Panel 3: Approvals -->
-  <section class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-    <h2 class="font-semibold mb-3">🕘 待审批 <span id="approval-count" class="text-xs text-amber-500"></span></h2>
-    <div id="proposals" class="space-y-3 max-h-[560px] overflow-y-auto pr-1"></div>
+  <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
+    <h2 class="font-semibold mb-3">🕘 审批台 <span id="approval-count" class="text-xs text-amber-500 font-normal"></span></h2>
+    <div id="proposals" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
   </section>
 </main>
 
 <!-- Vault footer -->
 <footer class="max-w-7xl mx-auto px-4 pb-8">
-  <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
-    <h2 class="font-semibold mb-2 text-sm">📚 Vault(磁盘上的 Markdown,Obsidian 可直接打开)</h2>
+  <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
+    <h2 class="font-semibold mb-2 text-sm">📚 Vault <span class="text-slate-500 font-normal text-xs">— 磁盘上的 Markdown,Obsidian 可直接打开</span></h2>
     <div id="vault" class="flex flex-wrap gap-2"></div>
   </div>
 </footer>
@@ -88,16 +111,16 @@
 <div id="view-digest" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-5">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="digest-cards"></div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
       <h2 class="font-semibold mb-3 flex items-center gap-2">🌻 园丁巡库
-        <button onclick="runGardener()" class="ml-auto text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg">运行巡库</button>
+        <button onclick="runGardener()" class="ml-auto text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg transition">运行巡库</button>
       </h2>
       <div id="digest-findings" class="space-y-2"></div>
     </div>
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
       <h2 class="font-semibold mb-3">🏷️ 高频标签</h2>
       <div id="digest-tags" class="flex flex-wrap gap-2"></div>
-      <p class="text-xs text-slate-600 mt-4">巡库发现的问题会列在左侧;双链建议会出现在工作台的审批队列中,批准后自动追加到既有笔记。</p>
+      <p class="text-xs text-slate-600 mt-4 leading-relaxed">巡库发现的问题会列在左侧;双链建议会出现在工作台的审批队列中,批准后自动追加到既有笔记。</p>
     </div>
   </div>
 </div>
@@ -106,16 +129,164 @@
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-const ITEM_STATUS = {
-  pending:         ['排队中','bg-slate-800 text-slate-400'],
-  processing:      ['Agent 处理中','bg-sky-950 text-sky-400'],
-  awaiting_approval:['待审批','bg-amber-950 text-amber-400'],
-  done:            ['已入库','bg-emerald-950 text-emerald-400'],
-  rejected:        ['已拒绝','bg-rose-950 text-rose-400'],
-  error:           ['出错','bg-rose-950 text-rose-400'],
+/* ---------- Agent 名录(配色统一来源) ---------- */
+const AGENTS = {
+  '分类员': { emoji:'🏷️', color:'sky' },
+  '摘要员': { emoji:'📝', color:'violet' },
+  '链接员': { emoji:'🔗', color:'amber' },
+  '质疑员': { emoji:'⚔️', color:'rose' },
+  '组装员': { emoji:'📦', color:'emerald' },
+  '园丁':   { emoji:'🌻', color:'lime' },
 };
-const LEVEL_STYLE = { info:'', warn:'border-amber-800 bg-amber-950/30', debate:'border-violet-800 bg-violet-950/30' };
+const AGENT_COLORS = {
+  sky:   { dot:'bg-sky-400',    text:'text-sky-300',    chip:'bg-sky-950/70 text-sky-300 border-sky-900/60' },
+  violet:{ dot:'bg-violet-400', text:'text-violet-300', chip:'bg-violet-950/70 text-violet-300 border-violet-900/60' },
+  amber: { dot:'bg-amber-400',  text:'text-amber-300',  chip:'bg-amber-950/70 text-amber-300 border-amber-900/60' },
+  rose:  { dot:'bg-rose-400',   text:'text-rose-300',   chip:'bg-rose-950/70 text-rose-300 border-rose-900/60' },
+  emerald:{dot:'bg-emerald-400',text:'text-emerald-300',chip:'bg-emerald-950/70 text-emerald-300 border-emerald-900/60' },
+  lime:  { dot:'bg-lime-400',   text:'text-lime-300',   chip:'bg-lime-950/70 text-lime-300 border-lime-900/60' },
+};
+function agentStyle(name) {
+  for (const [key, cfg] of Object.entries(AGENTS)) if (name.includes(key)) return cfg;
+  return { emoji:'⚡', color:'slate' };
+}
+const SLATE = { dot:'bg-slate-500', text:'text-slate-400', chip:'bg-slate-800/70 text-slate-300 border-slate-700' };
 
+const ITEM_STATUS = {
+  pending:          ['排队中','bg-slate-800 text-slate-400'],
+  processing:       ['Agent 处理中','bg-sky-950 text-sky-400'],
+  awaiting_approval:['待审批','bg-amber-950 text-amber-400'],
+  done:             ['已入库','bg-emerald-950 text-emerald-400'],
+  rejected:         ['已拒绝','bg-rose-950 text-rose-400'],
+  error:            ['出错','bg-rose-950 text-rose-400'],
+};
+const LEVEL_BORDER = { info:'', warn:'border-l-amber-500/70', debate:'border-l-violet-500/70' };
+
+/* ---------- Markdown-lite 渲染(提案预览用) ---------- */
+function mdLite(src) {
+  let h = esc(src);
+  h = h.replace(/\[\[([^\]]+)\]\]/g, '<span class="wikilink">[[$1]]</span>');
+  h = h.replace(/^### (.*)$/gm, '<div class="font-semibold text-slate-300 mt-2">$1</div>');
+  h = h.replace(/^## (.*)$/gm, '<div class="font-bold text-sky-300 mt-2">$1</div>');
+  h = h.replace(/^# (.*)$/gm, '<div class="font-bold text-base text-slate-100 mt-1">$1</div>');
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-slate-200">$1</strong>');
+  h = h.replace(/`([^`]+)`/g, '<code class="bg-slate-800 text-amber-200 rounded px-1 text-[11px]">$1</code>');
+  h = h.replace(/^- (.*)$/gm, '<div class="pl-3 border-l border-slate-700/60 ml-1 my-0.5">$1</div>');
+  h = h.replace(/^&gt; (.*)$/gm, '<div class="pl-2 border-l-2 border-slate-600 text-slate-400 italic my-1">$1</div>');
+  h = h.replace(/^---+$/gm, '<hr class="border-slate-800 my-2">');
+  return h.replace(/\n/g, '<br>');
+}
+
+/* ---------- Toast ---------- */
+function toast(msg, type='ok') {
+  const style = type === 'ok'
+    ? 'bg-emerald-950/90 border-emerald-800 text-emerald-200'
+    : 'bg-rose-950/90 border-rose-800 text-rose-200';
+  const el = document.createElement('div');
+  el.className = `toast border rounded-xl px-4 py-2.5 text-sm shadow-xl backdrop-blur ${style}`;
+  el.textContent = msg;
+  $('toasts').appendChild(el);
+  setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity .4s'; setTimeout(() => el.remove(), 400); }, 3200);
+}
+
+/* ---------- 流水线舞台条 ---------- */
+const STAGES = [
+  { key:'分类员', label:'分类' }, { key:'摘要员', label:'摘要·互链' },
+  { key:'质疑员', label:'对抗审查' }, { key:'组装员', label:'组装提案' }, { key:'审批', label:'人工审批' },
+];
+function renderStagebar(s) {
+  const processing = s.items.find(i => i.status === 'processing');
+  const latest = processing ? s.items.find(i => i.id === processing.id) : null;
+  const fired = new Set();
+  if (latest) {
+    for (const e of s.events) if (e.item_id === latest.id) {
+      for (const st of STAGES) if (e.agent.includes(st.key)) fired.add(st.key);
+    }
+  }
+  const anyPendingApproval = s.proposals.some(p => p.status === 'pending');
+  $('stagebar').innerHTML =
+    `<span class="text-[10px] text-slate-500 mr-2 whitespace-nowrap">${processing ? '⚡ 正在处理「' + esc(processing.title) + '」' : '流水线待命'}</span>` +
+    STAGES.map((st, i) => {
+      const active = processing && fired.has(st.key);
+      const isApproval = st.key === '审批';
+      const lit = active || (isApproval && !processing && anyPendingApproval);
+      const cfg = AGENTS[st.key] ? AGENT_COLORS[AGENTS[st.key].color] : {text:'text-amber-300'};
+      const emoji = AGENTS[st.key] ? AGENTS[st.key].emoji : '✋';
+      return `<div class="flex items-center gap-1 whitespace-nowrap">
+        <div class="px-2.5 py-1 rounded-full border text-[11px] border-slate-700/70 text-slate-500 ${lit ? 'stage-active border-sky-600/60 bg-sky-950/60 text-sky-300 stage-glow' : ''}">${emoji} ${st.label}</div>
+        ${i < STAGES.length - 1 ? '<div class="w-4 h-px bg-slate-700/70"></div>' : ''}
+      </div>`;
+    }).join('');
+}
+
+/* ---------- 主渲染 ---------- */
+function render(s) {
+  $('llm-badge').textContent = s.llm.mock ? 'LLM: MOCK 模式' : `LLM: ${s.llm.model}`;
+  $('llm-badge').className = 'px-2.5 py-1 rounded-full ' + (s.llm.mock ? 'bg-amber-950 text-amber-400' : 'bg-emerald-950 text-emerald-400');
+  renderStagebar(s);
+
+  // Agent 图例
+  $('agent-legend').innerHTML = Object.entries(AGENTS).map(([name, cfg]) => {
+    const c = AGENT_COLORS[cfg.color];
+    return `<span class="text-[10px] px-2 py-0.5 rounded-full border ${c.chip}">${cfg.emoji} ${name}</span>`;
+  }).join('');
+
+  // 队列
+  $('item-count').textContent = `(${s.items.length})`;
+  $('items').innerHTML = s.items.map(i => {
+    const [label, cls] = ITEM_STATUS[i.status] || [i.status,'bg-slate-800'];
+    return `<div class="flex items-center gap-2 text-sm bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 fade-in hover:border-slate-600 transition">
+      <span class="truncate flex-1">${esc(i.title)}</span>
+      <span class="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}">${label}</span></div>`;
+  }).join('') || `<div class="text-xs text-slate-600 border border-dashed border-slate-800 rounded-lg px-3 py-6 text-center">📭 还没有内容<br>把想收藏的文章粘贴到左边开始</div>`;
+
+  // 事件流:Agent 配色头像 + 时间线
+  $('events').innerHTML = s.events.map(e => {
+    const cfg = agentStyle(e.agent);
+    const c = AGENT_COLORS[cfg.color] || SLATE;
+    const time = new Date(e.created_at * 1000).toLocaleTimeString('zh-CN',{hour12:false});
+    return `<div class="flex gap-2.5 fade-in">
+      <div class="flex flex-col items-center pt-0.5">
+        <div class="w-7 h-7 rounded-full grid place-items-center text-sm bg-slate-950 border border-slate-700 ${c.text}">${cfg.emoji}</div>
+        <div class="w-px flex-1 bg-slate-800 mt-1"></div>
+      </div>
+      <div class="flex-1 pb-2 min-w-0">
+        <div class="flex justify-between items-baseline gap-2">
+          <span class="text-xs font-medium ${c.text}">${esc(e.agent.replace(cfg.emoji,'').trim())}</span>
+          <span class="text-[10px] text-slate-600">${time}</span>
+        </div>
+        <div class="text-xs text-slate-400 leading-relaxed break-words">「<span class="text-slate-300">${esc(e.item_title || '')}</span>」${esc(e.message)}</div>
+      </div></div>`;
+  }).join('') || `<div class="text-xs text-slate-600 border border-dashed border-slate-800 rounded-lg px-3 py-6 text-center">🤖 Agent 们待命中…<br>投递内容后可以看到流水线实况</div>`;
+
+  // 审批台
+  const pending = s.proposals.filter(p => p.status==='pending');
+  $('approval-count').textContent = pending.length ? `${pending.length} 条待处理` : '';
+  $('proposals').innerHTML = s.proposals.map(p => {
+    if (p.status==='pending') {
+      return `<div class="border border-amber-900/50 bg-slate-950 rounded-xl p-3 fade-in hover:border-amber-700/60 transition">
+        <div class="flex justify-between items-center mb-2 text-xs">
+          <span class="text-amber-400 font-mono">#${p.id} → vault/${esc(p.filepath)}</span>
+          <span class="${p.verdict==='pass'?'text-emerald-400':p.verdict==='questioned'?'text-violet-400':'text-lime-400'}">${p.verdict==='pass'?'✅ 审查通过':p.verdict==='questioned'?'⚔️ 质疑员存疑':'🌻 园丁建议'}</span>
+        </div>
+        <div class="text-[11px] leading-relaxed text-slate-400 max-h-48 overflow-y-auto bg-slate-900/70 rounded-lg p-2.5 border border-slate-800">${p.kind==='link_suggestion' ? mdLite(p.markdown) : mdLite(p.markdown)}</div>
+        <div class="flex gap-2 mt-2.5">
+          <button onclick="act(${p.id},'approve')" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg py-1.5 text-xs font-medium transition">✅ 批准入库</button>
+          <button onclick="act(${p.id},'reject')" class="flex-1 bg-slate-800 hover:bg-rose-900 text-slate-300 rounded-lg py-1.5 text-xs transition">🚫 拒绝</button>
+        </div></div>`;
+    }
+    const [label, cls] = p.status==='approved' ? ['已入库','text-emerald-400'] : ['已拒绝','text-rose-400'];
+    return `<div class="border border-slate-800 bg-slate-950/50 rounded-lg px-3 py-2 text-xs flex justify-between fade-in opacity-70">
+      <span class="font-mono text-slate-500">#${p.id} ${esc(p.filepath)}</span><span class="${cls}">${label}</span></div>`;
+  }).join('') || `<div class="text-xs text-slate-600 border border-dashed border-slate-800 rounded-lg px-3 py-6 text-center">🕘 暂无待审批提案<br>Agent 的每笔修改都会先到这里等你确认</div>`;
+
+  // vault
+  $('vault').innerHTML = s.vault.map(f =>
+    `<span class="text-xs bg-slate-950 border border-slate-800 hover:border-sky-800 rounded-full px-3 py-1 font-mono transition">📄 ${esc(f)}</span>`
+  ).join('') || '<span class="text-xs text-slate-600">空</span>';
+}
+
+/* ---------- 轮询与动作 ---------- */
 async function poll(){
   try {
     const r = await fetch('/api/state');
@@ -123,66 +294,22 @@ async function poll(){
   } catch(e) { /* server restarting */ }
 }
 
-function render(s){
-  $('llm-badge').textContent = s.llm.mock ? 'LLM: MOCK 模式' : `LLM: ${s.llm.model}`;
-  $('llm-badge').className = 'px-2 py-1 rounded-full ' + (s.llm.mock ? 'bg-amber-950 text-amber-400' : 'bg-emerald-950 text-emerald-400');
-
-  // 队列
-  $('item-count').textContent = `(${s.items.length})`;
-  $('items').innerHTML = s.items.map(i => {
-    const [label, cls] = ITEM_STATUS[i.status] || [i.status,'bg-slate-800'];
-    return `<div class="flex items-center gap-2 text-sm bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 fade-in">
-      <span class="truncate flex-1">${esc(i.title)}</span>
-      <span class="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}">${label}</span></div>`;
-  }).join('') || '<p class="text-xs text-slate-600">空</p>';
-
-  // 事件流
-  $('events').innerHTML = s.events.map(e => {
-    const time = new Date(e.created_at * 1000).toLocaleTimeString('zh-CN',{hour12:false});
-    const cls = LEVEL_STYLE[e.level] || 'border-slate-800 bg-slate-950';
-    return `<div class="text-xs border rounded-lg px-3 py-2 fade-in ${cls}">
-      <div class="flex justify-between text-slate-500 mb-0.5"><span>${esc(e.agent)}</span><span>${time}</span></div>
-      <div class="text-slate-300">「${esc(e.item_title)}」${esc(e.message)}</div></div>`;
-  }).join('') || '<p class="text-xs text-slate-600">Agent 们待命中……投递内容后可以看到流水线实况</p>';
-
-  // 提案
-  const pending = s.proposals.filter(p => p.status==='pending');
-  $('approval-count').textContent = pending.length ? `${pending.length} 条待处理` : '';
-  $('proposals').innerHTML = s.proposals.map(p => {
-    if (p.status==='pending') {
-      return `<div class="border border-amber-900/60 bg-slate-950 rounded-lg p-3 fade-in">
-        <div class="flex justify-between items-center mb-2 text-xs">
-          <span class="text-amber-400 font-mono">#${p.id} → vault/${esc(p.filepath)}</span>
-          <span class="${p.verdict==='pass'?'text-emerald-400':'text-violet-400'}">${p.verdict==='pass'?'✅ 审查通过':'⚔️ 质疑员存疑'}</span>
-        </div>
-        <pre class="text-[11px] leading-relaxed text-slate-400 whitespace-pre-wrap max-h-48 overflow-y-auto bg-slate-900 rounded-lg p-2 border border-slate-800">${esc(p.markdown)}</pre>
-        <div class="flex gap-2 mt-2">
-          <button onclick="act(${p.id},'approve')" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg py-1.5 text-xs font-medium">✅ 批准入库</button>
-          <button onclick="act(${p.id},'reject')" class="flex-1 bg-slate-800 hover:bg-rose-900 text-slate-300 rounded-lg py-1.5 text-xs">🚫 拒绝</button>
-        </div></div>`;
-    }
-    const [label, cls] = p.status==='approved' ? ['已入库','text-emerald-400'] : ['已拒绝','text-rose-400'];
-    return `<div class="border border-slate-800 bg-slate-950/50 rounded-lg px-3 py-2 text-xs flex justify-between fade-in">
-      <span class="font-mono text-slate-500">#${p.id} ${esc(p.filepath)}</span><span class="${cls}">${label}</span></div>`;
-  }).join('') || '<p class="text-xs text-slate-600">暂无提案</p>';
-
-  // vault
-  $('vault').innerHTML = s.vault.map(f =>
-    `<span class="text-xs bg-slate-950 border border-slate-800 rounded-full px-3 py-1 font-mono">📄 ${esc(f)}</span>`
-  ).join('') || '<span class="text-xs text-slate-600">空</span>';
-}
-
 async function act(pid, action){
-  await fetch(`/api/proposals/${pid}/${action}`, {method:'POST'});
+  try {
+    const r = await fetch(`/api/proposals/${pid}/${action}`, {method:'POST'});
+    const d = await r.json();
+    if (action === 'approve') toast(d.kind === 'link_suggestion' ? `🌻 双链已追加到 ${d.file}` : `✅ 已入库 vault/${d.file}`);
+    else toast('🚫 已拒绝该提案', 'warn');
+  } catch(e) { toast('操作失败,请重试', 'warn'); }
   poll();
 }
 
-// ---------- 简报 ----------
+/* ---------- 简报 ---------- */
 function switchTab(tab){
   $('view-workbench').classList.toggle('hidden', tab !== 'workbench');
   $('view-digest').classList.toggle('hidden', tab !== 'digest');
-  $('tab-workbench').className = 'px-3 py-1 rounded-full font-medium ' + (tab==='workbench' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-400');
-  $('tab-digest').className = 'px-3 py-1 rounded-full font-medium ' + (tab==='digest' ? 'bg-sky-600 text-white' : 'bg-slate-800 text-slate-400');
+  $('tab-workbench').className = 'px-3 py-1 rounded-full font-medium transition ' + (tab==='workbench' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200');
+  $('tab-digest').className = 'px-3 py-1 rounded-full font-medium transition ' + (tab==='digest' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200');
   if (tab === 'digest') fetchDigest();
 }
 
@@ -196,13 +323,13 @@ async function fetchDigest(){
       ['📚 库存笔记', d.vault.total, 'text-violet-400'],
     ];
     $('digest-cards').innerHTML = cards.map(([label, val, cls]) => `
-      <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 hover:border-slate-600 transition">
         <div class="text-2xl font-bold ${cls}">${val}</div>
         <div class="text-xs text-slate-500 mt-1">${label}</div></div>`).join('');
     const ISSUE = {
-      orphan: ['🏝️ 孤立','border-amber-900/60'],
-      stale: ['⏳ 疑似过时','border-slate-700'],
-      thin: ['🪶 薄弱','border-slate-700'],
+      orphan: ['🏝️ 孤立','border-amber-900/60 text-amber-300'],
+      stale: ['⏳ 疑似过时','border-slate-700 text-slate-300'],
+      thin: ['🪶 薄弱','border-slate-700 text-slate-300'],
     };
     $('digest-findings').innerHTML = d.findings.length
       ? d.findings.map(f => {
@@ -220,9 +347,11 @@ async function fetchDigest(){
 }
 
 async function runGardener(){
-  const r = await (await fetch('/api/garden/run', {method:'POST'})).json();
-  alert(`🌻 巡库完成:${r.total_notes} 篇笔记,${r.findings.length} 个发现,新建 ${r.proposals_created} 条双链提案(去工作台审批)`);
-  fetchDigest();
+  try {
+    const r = await (await fetch('/api/garden/run', {method:'POST'})).json();
+    toast(`🌻 巡库完成:${r.total_notes} 篇 · ${r.findings.length} 个发现 · ${r.proposals_created} 条双链提案`);
+    fetchDigest();
+  } catch(e) { toast('巡库失败', 'warn'); }
 }
 
 $('inbox-form').addEventListener('submit', async e => {
@@ -230,6 +359,7 @@ $('inbox-form').addEventListener('submit', async e => {
   const body = { title: $('f-title').value.trim(), url: $('f-url').value.trim(), content: $('f-content').value };
   if (!body.title) return;
   await fetch('/api/inbox', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  toast('📥 已投递,Agent 流水线启动');
   e.target.reset();
   poll();
 });
