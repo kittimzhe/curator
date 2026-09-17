@@ -10,6 +10,10 @@
 
 ![screenshot](docs/screenshot-p0.png)
 
+**30-second demo**: semantic search → RAG Q&A → submit → agent pipeline → approve → auto-indexed for retrieval
+
+![demo](docs/demo.gif)
+
 ## Why InsightLoom
 
 Existing "AI second brain" tools (e.g., khoj) are mostly **passive retrieval**: you ask, they answer. InsightLoom differs by **active processing**:
