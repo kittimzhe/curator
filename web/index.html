@@ -356,6 +356,13 @@
       <button onclick="switchTab('digest')"
               class="btn-secondary">查看今日简报</button>
     </div>
+    <div class="mt-4 flex flex-wrap gap-2">
+      <input id="search-q" maxlength="200" placeholder="问问你的知识库,如:RAG 检索质量有什么瓶颈?(本地语义检索)"
+             class="input-field flex-1" style="min-width:240px;max-width:640px">
+      <button onclick="doSearch()" class="btn-primary">🔍 检索</button>
+      <button onclick="doAsk()" class="btn-secondary">✨ AI 回答</button>
+    </div>
+    <div id="search-results" class="hidden mt-3 space-y-2"></div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5 text-xs">
       <div class="feature-tile">👀 看得见的治理流水线：分类、摘要、互链、审查全流程可视。</div>
       <div class="feature-tile">✅ 人审批才落盘：AI 只提交提案，未经确认不改知识库。</div>
@@ -885,6 +892,53 @@ applyTheme(readThemePreference());
 bindSystemThemeListener();
 bindInboxEnhancements();
 setInboxSubmitting(false);
+
+/* ---------- 知识库检索 / 问答 ---------- */
+async function doSearch(){
+  const q = $('search-q').value.trim();
+  if (!q) return;
+  const box = $('search-results');
+  box.classList.remove('hidden');
+  box.innerHTML = '<div class="feature-tile fade-in">🔍 语义检索中…(本地嵌入)</div>';
+  try {
+    const d = await (await fetch('/api/search?q=' + encodeURIComponent(q))).json();
+    if (!d.results?.length) {
+      box.innerHTML = '<div class="feature-tile">📭 没有命中。试试换个说法,或先投递一些材料、运行一次索引重建。</div>';
+      return;
+    }
+    box.innerHTML = d.results.map(r => `
+      <div class="feature-tile fade-in">
+        <div class="flex justify-between gap-2">
+          <span class="font-medium text-slate-700">📘 ${esc(r.title)} <span class="text-slate-400">§ ${esc(r.section)}</span></span>
+          <span class="text-[10px] text-slate-400 whitespace-nowrap">${r.score}</span>
+        </div>
+        <div class="text-slate-500 mt-1 text-[11px] leading-relaxed">${esc(r.snippet)}…</div>
+      </div>`).join('');
+  } catch(e) {
+    box.innerHTML = '<div class="feature-tile">检索失败,请确认服务正常。</div>';
+  }
+}
+
+async function doAsk(){
+  const q = $('search-q').value.trim();
+  if (!q) return;
+  const box = $('search-results');
+  box.classList.remove('hidden');
+  box.innerHTML = '<div class="feature-tile fade-in">✨ 正在从知识库检索相关小节并组织回答…</div>';
+  try {
+    const d = await (await fetch('/api/ask', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({question: q})})).json();
+    const cites = (d.citations || []).map(c => `<span class="wikilink">${esc(c)}</span>`).join(' ');
+    box.innerHTML = `
+      <div class="feature-tile fade-in">
+        <div class="text-slate-700 leading-relaxed">${esc(d.answer)}</div>
+        ${cites ? `<div class="mt-2 flex flex-wrap gap-1.5">${cites}</div>` : ''}
+      </div>`;
+  } catch(e) {
+    box.innerHTML = '<div class="feature-tile">回答生成失败,请重试。</div>';
+  }
+}
+
+$('search-q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
 poll();
 setInterval(poll, 2000);

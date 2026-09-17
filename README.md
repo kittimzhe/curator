@@ -91,7 +91,10 @@ curator/
 | POST | `/api/proposals/{id}/reject` | 拒绝提案 |
 | POST | `/api/garden/run` | 🌻 触发园丁巡库(发现 + 双链提案) |
 | GET | `/api/digest` | 每日简报:24h 统计 + vault 健康度 + 巡库发现 |
-| GET | `/api/health` | 健康检查 + LLM 状态 |
+| GET | `/api/search?q=` | 语义检索 vault(本地嵌入,返回小节级命中) |
+| POST | `/api/ask` | RAG 问答 `{question}`,回答带引用笔记 |
+| POST | `/api/reindex` | 全量重建语义索引 |
+| GET | `/api/health` | 健康检查 + LLM/检索状态 |
 
 ## 路线图
 
@@ -99,7 +102,7 @@ curator/
 
 - [x] **P0** 核心闭环:收件箱 → 五 Agent 流水线 → 审批 → vault 落盘
 - [x] **P1a** 🌻 园丁 Agent:巡库检测孤立/过时/薄弱笔记,双链建议走统一审批(批准后自动追加 `[[双链]]` 到既有笔记)+ 每日简报页(24h 统计/标签/健康度)
-- [ ] **P1c** 检索层:本地向量库(Chroma)+ 语义检索 API + 链接员语义化 + 问答框
+- [x] **P1c** 检索层:本地向量库(Chroma + 本地 ONNX 嵌入,无需云 API)+ 语义检索 `/api/search` + 链接员语义化 + RAG 问答 `/api/ask`(带引用);审批落盘自动入索引
 - [ ] **P1b** 知识图谱视图(双链可视化)、React 前端重构
 - [ ] **P2** Docker 一键部署、采集端(bookmarklet → 浏览器插件 → Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
 - [ ] **P3** 本地模型适配(Ollama)、checkpointer 时间旅行、RSS/邮件采集、多用户
