@@ -14,4 +14,4 @@ depth: read_later
 —(稍后读快车道,未触发对抗审查)
 
 ---
-*由 Curator Agent 流水线生成,经人工审批入库*
+*由 洞察织机(InsightLoom)Agent 流水线生成,经人工审批入库*

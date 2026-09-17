@@ -18,4 +18,4 @@ depth: deep
 ✅ 质疑员审查通过
 
 ---
-*由 Curator Agent 流水线生成,经人工审批入库*
+*由 洞察织机(InsightLoom)Agent 流水线生成,经人工审批入库*

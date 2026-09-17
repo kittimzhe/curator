@@ -1,16 +1,18 @@
-# 🏛️ Curator
+# 🧭 InsightLoom
 
 **English** | [简体中文](README.md)
 
-> Hire a team of AI librarians for your digital brain.
+> Weave your saved information into actionable insight.
 
-**Curator** is a self-hosted personal knowledge workbench: drop articles, papers, links, and notes into your inbox, and a team of **visible agents** will triage, summarize, cross-link, and adversarially review them — then generate a daily digest. **Nothing is written to your knowledge base until you approve it.**
+**InsightLoom** is a self-hosted personal knowledge workbench: drop articles, papers, links, and notes into your inbox, and a team of **visible agents** will triage, summarize, cross-link, and adversarially review them — then generate a daily digest. **Nothing is written to your knowledge base until you approve it.**
+
+> Planned website domain: `insightloomapp.com`
 
 ![screenshot](docs/screenshot-p0.png)
 
-## Why Curator
+## Why InsightLoom
 
-Existing "AI second brain" tools (e.g., khoj) are mostly **passive retrieval**: you ask, they answer. Curator differs by **active processing**:
+Existing "AI second brain" tools (e.g., khoj) are mostly **passive retrieval**: you ask, they answer. InsightLoom differs by **active processing**:
 
 - 🔍 **Visible pipeline**: open the UI and watch the Classifier, Summarizer, Linker, and Skeptic process your reading queue in real time
 - ⚔️ **Adversarial review**: the Skeptic red-teams the Summarizer's output — overgeneralization and hallucination get flagged
@@ -101,6 +103,16 @@ curator/
 - [ ] **P1b** Knowledge graph view (link visualization), React frontend
 - [ ] **P2** Docker one-command deploy, capture endpoints (bookmarklet → browser extension → Telegram bot), demo GIF, public launch
 - [ ] **P3** Local model support (Ollama), checkpointer time-travel, RSS/email capture, multi-user
+
+## Launch Checklist
+
+- Minimal launch checklist: **[`docs/LAUNCH_MIN_CHECKLIST.md`](docs/LAUNCH_MIN_CHECKLIST.md)**
+
+## Current Execution Logs
+
+- Competition tracking (Delin Cup / Residency): **[`docs/COMPETITION_DELIN_CUP_2026.md`](docs/COMPETITION_DELIN_CUP_2026.md)**
+- Initialization adjustments: **[`docs/INIT_ADJUSTMENTS.md`](docs/INIT_ADJUSTMENTS.md)**
+- Pitch deck template: **[`docs/BP_OUTLINE.md`](docs/BP_OUTLINE.md)**
 
 ## Design Decision Records (ADR summary)
 

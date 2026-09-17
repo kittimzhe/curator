@@ -1,4 +1,4 @@
-"""Curator Agent 流水线(LangGraph)。
+"""洞察织机(InsightLoom)Agent 流水线(LangGraph)。
 
 结构:
 
@@ -161,7 +161,7 @@ def assemble(state: State) -> dict:
         "pass": "✅ 质疑员审查通过",
         "questioned": f"⚠️ 质疑员存疑:{state.get('comment', '')}",
     }.get(state.get("verdict", ""), "—(稍后读快车道,未触发对抗审查)")
-    lines += ["## Agent 审查", verdict_text, "", "---", "*由 Curator Agent 流水线生成,经人工审批入库*"]
+    lines += ["## Agent 审查", verdict_text, "", "---", "*由 洞察织机(InsightLoom)Agent 流水线生成,经人工审批入库*"]
     markdown = "\n".join(lines)
 
     filename = store.slugify(state["title"])

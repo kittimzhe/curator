@@ -1,4 +1,4 @@
-"""Curator API 服务(FastAPI)。
+"""洞察织机（InsightLoom）API 服务(FastAPI)。
 
 端点:
 - POST /api/inbox               投递内容,触发 Agent 流水线
@@ -34,7 +34,7 @@ from . import llm
 from . import pipeline
 from . import store
 
-app = FastAPI(title="Curator", version="0.1.0")
+app = FastAPI(title="InsightLoom API", version="0.1.0")
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 
