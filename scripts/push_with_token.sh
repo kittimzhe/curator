@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Curator 一键发布:用 PAT 建仓 + 推送 + 验证
+# InsightLoom 一键发布:用 PAT 建仓 + 推送 + 验证
 # 用法: CURATOR_GH_TOKEN=ghp_xxx bash scripts/push_with_token.sh [repo名] [用户名]
 set -euo pipefail
 
 TOKEN="${CURATOR_GH_TOKEN:?需要环境变量 CURATOR_GH_TOKEN=ghp_xxx}"
-REPO="${1:-curator}"
+REPO="${1:-insightloom}"
 USER="${2:-kittimzhe}"
 cd "$(dirname "$0")/.."
 
@@ -15,7 +15,7 @@ echo "  ✓ token 属于 $LOGIN"
 
 echo "▶ 2/4 创建仓库 $USER/$REPO (public)..."
 curl -s -X POST -H "Authorization: Bearer $TOKEN" https://api.github.com/user/repos \
-  -d "{\"name\":\"$REPO\",\"description\":\"🏛️ 给你的数字大脑雇一队 AI 图书管理员 — 可见 multi-agent 流水线的个人知识工作台\",\"public\":true}" \
+  -d "{\"name\":\"$REPO\",\"description\":\"🧭 洞察织机 InsightLoom — 把收藏变成可用知识:可见 multi-agent 流水线的自托管知识工作台\",\"public\":true}" \
   | python3 -c 'import json,sys; d=json.load(sys.stdin); print("  ✓", d.get("html_url") or d.get("message"))'
 
 echo "▶ 3/4 推送..."
