@@ -93,11 +93,14 @@ curator/
 
 ## 路线图
 
+> 完整产品形态(五层架构/用户旅程/里程碑)见 **[docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md)**
+
 - [x] **P0** 核心闭环:收件箱 → 五 Agent 流水线 → 审批 → vault 落盘
 - [x] **P1a** 🌻 园丁 Agent:巡库检测孤立/过时/薄弱笔记,双链建议走统一审批(批准后自动追加 `[[双链]]` 到既有笔记)+ 每日简报页(24h 统计/标签/健康度)
+- [ ] **P1c** 检索层:本地向量库(Chroma)+ 语义检索 API + 链接员语义化 + 问答框
 - [ ] **P1b** 知识图谱视图(双链可视化)、React 前端重构
-- [ ] **P2** Docker 一键部署、采集端(bookmarklet → 浏览器插件 → Telegram bot)、demo GIF、双语 README、正式发布(V2EX / 掘金 / HN / r/selfhosted)
-- [ ] **P3** 本地模型适配(Ollama)、checkpointer 时间旅行、社区贡献指南
+- [ ] **P2** Docker 一键部署、采集端(bookmarklet → 浏览器插件 → Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
+- [ ] **P3** 本地模型适配(Ollama)、checkpointer 时间旅行、RSS/邮件采集、多用户
 
 ## 设计决策记录(ADR 摘要)
 

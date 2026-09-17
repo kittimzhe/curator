@@ -93,11 +93,14 @@ curator/
 
 ## Roadmap
 
+> Full product blueprint (5-layer architecture / user journey / milestones) in **Chinese**: [docs/PRODUCT_VISION.md](docs/PRODUCT_VISION.md)
+
 - [x] **P0** Core loop: inbox → 5-agent pipeline → approval → vault
 - [x] **P1a** 🌻 Gardener agent: vault scan for orphan/stale/thin notes, link suggestions through the same approval queue (auto-appends `[[wiki-links]]` on approval) + daily digest page
+- [ ] **P1c** Retrieval layer: local vector store (Chroma) + semantic search API + semantic Linker + Q&A box
 - [ ] **P1b** Knowledge graph view (link visualization), React frontend
-- [ ] **P2** Docker one-command deploy, capture endpoints (bookmarklet → browser extension → Telegram bot), demo GIF, bilingual README, public launch
-- [ ] **P3** Local model support (Ollama), checkpointer time-travel, contribution guide
+- [ ] **P2** Docker one-command deploy, capture endpoints (bookmarklet → browser extension → Telegram bot), demo GIF, public launch
+- [ ] **P3** Local model support (Ollama), checkpointer time-travel, RSS/email capture, multi-user
 
 ## Design Decision Records (ADR summary)
 
