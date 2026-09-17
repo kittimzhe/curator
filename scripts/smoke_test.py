@@ -42,8 +42,11 @@ r = client.post(
     json={
         "title": "冒烟测试条目",
         "content": (
-            "端到端冒烟测试:该内容足够长以触发深加工分支。"
-            "分类员路由后,摘要员与链接员并行,质疑员审查,组装员产出提案。"
+            "端到端冒烟测试:该内容刻意写得足够长,确保 MOCK 分类员判定为 deep 深加工分支"
+            "(提示词长度需超过 120 字符)。分类员路由后,摘要员与链接员并行执行,"
+            "链接员会调用本地嵌入检索(冷环境会下载约 79MB 的 ONNX 模型),"
+            "随后质疑员做对抗式审查,最终由组装员产出提案。"
+            "内含强断言与数字以命中 deep 判据:处理效率提升 300%,断言覆盖率 95%,召回率 82%。"
         ),
     },
 )
@@ -60,8 +63,15 @@ for _ in range(60):
     time.sleep(0.5)
 check("流水线产出提案", pid is not None, f"proposal #{pid}")
 
-# 4) 事件流应有多个 Agent 发声
-agents = {e["agent"] for e in st["events"]}
+# 3b) 事件异步落库:等到事件流稳定且角色数达标(全新环境里
+#     link() 首次触发嵌入模型下载,可能让事件间隔长达数十秒)
+agents: set[str] = set()
+for _ in range(180):  # 最多 90 秒
+    agents = {e["agent"] for e in st["events"]}
+    if len(agents) >= 4:
+        break
+    time.sleep(0.5)
+    st = client.get("/api/state").json()
 check("多 Agent 事件", len(agents) >= 4, f"{len(agents)} 个角色: {sorted(agents)[:5]}")
 
 # 5) 审批落盘
