@@ -12,9 +12,7 @@
 - [x] OG 分享图:已接入极简版 `og-image-insightloom-minimal.png`
 - [x] API 标题改为 `InsightLoom API`
 - [x] 产品愿景文档主标题同步到 InsightLoom
-- [x] 竞赛记录已落地:`docs/COMPETITION__CUP_2026.md`
 - [x] `docs/PRODUCT_VISION.md` 历史 `Curator` 字样已清理
-- [x] BP 模板已落地:`docs/BP_OUTLINE.md`
 - [x] 代码层品牌残留清理:落盘脚注与 docstring(pipeline/store/llm),存量 vault 笔记脚注批量迁移
 - [x] README 首屏截图更新为浅色新版 UI
 

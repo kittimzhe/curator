@@ -123,15 +123,6 @@ curator/
 
 - 最小发布清单见: **[`docs/LAUNCH_MIN_CHECKLIST.md`](docs/LAUNCH_MIN_CHECKLIST.md)**
 
-## 近期执行记录
-
-- 竞赛记录（/Residency）: **[`docs/COMPETITION__CUP_2026.md`](docs/COMPETITION__CUP_2026.md)**
-- 初始化调整清单: **[`docs/INIT_ADJUSTMENTS.md`](docs/INIT_ADJUSTMENTS.md)**
-- 参赛 BP 模板: **[`docs/BP_OUTLINE.md`](docs/BP_OUTLINE.md)**
-- 参赛定位与复用指南: **[`docs/COMPETITION_POSITIONING.md`](docs/COMPETITION_POSITIONING.md)**
-- 参赛叙事升维版(B 口径): **[`docs/BP_TEAM_NARRATIVE.md`](docs/BP_TEAM_NARRATIVE.md)**
-- 技术证据页(评委可查证): **[`docs/PROOF_POINTS.md`](docs/PROOF_POINTS.md)**
-
 ## 设计决策记录(ADR 摘要)
 
 1. **为什么 Markdown 而不是数据库存知识?** —— 零锁定是采纳第一动力;过程状态(SQLite)与知识本体(文件)分离,用户随时带着文件走

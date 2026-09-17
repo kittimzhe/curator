@@ -120,12 +120,6 @@ curator/
 
 - Minimal launch checklist: **[`docs/LAUNCH_MIN_CHECKLIST.md`](docs/LAUNCH_MIN_CHECKLIST.md)**
 
-## Current Execution Logs
-
-- Competition tracking ( Cup / Residency): **[`docs/COMPETITION__CUP_2026.md`](docs/COMPETITION__CUP_2026.md)**
-- Initialization adjustments: **[`docs/INIT_ADJUSTMENTS.md`](docs/INIT_ADJUSTMENTS.md)**
-- Pitch deck template: **[`docs/BP_OUTLINE.md`](docs/BP_OUTLINE.md)**
-
 ## Design Decision Records (ADR summary)
 
 1. **Why Markdown instead of a database for knowledge?** — Zero lock-in is the #1 adoption driver; process state (SQLite) is strictly separated from the knowledge itself (files), so you can take your files and leave anytime
