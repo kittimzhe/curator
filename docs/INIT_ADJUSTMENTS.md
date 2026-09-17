@@ -18,9 +18,10 @@
 - [x] 代码层品牌残留清理:落盘脚注与 docstring(pipeline/store/llm),存量 vault 笔记脚注批量迁移
 - [x] README 首屏截图更新为浅色新版 UI
 
+- [x] **GitHub 仓库名 `curator` → `insightloom`**(已完成,旧链接 301 重定向,本地 remote 已同步)
+
 ## 待完成(下一轮)
 
-- [ ] **GitHub 仓库名 `curator` → `insightloom`**(Settings → Rename,旧链接自动重定向;建议发布前完成)
 - [ ] 评估是否把环境变量前缀 `CURATOR_` 迁移到 `INSIGHTLOOM_`(建议做兼容映射,避免中断)
 - [ ] 在部署平台完成正式域名绑定并验证 OG 抓取
 - [ ] 增加基础访问统计(如 Plausible/Umami)用于后续增长验证
