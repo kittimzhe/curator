@@ -101,16 +101,39 @@ def summarize(state: State) -> dict:
 
 def link(state: State) -> dict:
     vault_notes = store.list_vault_notes()
+    # 语义候选优先:用本地向量检索找出最相关的既有笔记小节,给 LLM 一个
+    # 高质量短名单;检索不可用时回退全量笔记列表(原行为)。
+    try:
+        from . import retrieval
+
+        hits = retrieval.search(state["content"][:500], k=8)
+    except Exception:  # noqa: BLE001 —— 检索层故障不影响流水线
+        hits = []
+    if hits:
+        seen, candidates = set(), []
+        for h in hits:
+            if h["note"] not in seen:
+                seen.add(h["note"])
+                candidates.append(f"{h['note']}(相关小节:{h['section']})")
+        candidate_desc = "语义相关候选:\n" + "\n".join(candidates)
+        _log(state, "link", f"语义检索给出 {len(candidates)} 个候选(本地嵌入)")
+    else:
+        candidate_desc = f"既有笔记:{vault_notes}"
     data = llm.parse_json(
         llm.ask_llm(
             "你是链接员(输出 JSON)。从既有笔记列表中找出与该内容相关的笔记(最多 3 条),"
             '没有则给空数组。输出 {"connections": ["文件名.md"], "reasons": ["原因"]}',
-            f"新内容标题:{state['title']}\n内容摘要片段:{state['content'][:300]}\n\n"
-            f"既有笔记:{vault_notes}",
+            f"新内容标题:{state['title']}\n内容摘要片段:{state['content'][:300]}\n\n{candidate_desc}",
             expect_json=True,
         )
     )
-    conns = [c for c in data.get("connections", []) if c in vault_notes]  # 幻觉防护:只保留真实存在的笔记
+    conns = []
+    for c in data.get("connections", []):
+        base = c.split("(")[0].strip()  # 兼容候选带"(相关小节:…)"后缀的引用
+        if base in vault_notes:
+            conns.append(base)
+        elif c in vault_notes:  # 幻觉防护:只保留真实存在的笔记
+            conns.append(c)
     if data.get("connections") and not conns:
         _log(state, "link", "LLM 提到的笔记不存在,已过滤(幻觉防护)", level="warn")
     _log(state, "link", f"连接到 {len(conns)} 条既有笔记: {conns}")

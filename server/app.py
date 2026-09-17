@@ -32,11 +32,13 @@ except ImportError:
 from . import gardener
 from . import llm
 from . import pipeline
+from . import retrieval
 from . import store
 
 app = FastAPI(title="InsightLoom API", version="0.1.0")
 
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
+VAULT_DIR = Path(__file__).resolve().parent.parent / "vault"
 
 
 class InboxItem(BaseModel):
@@ -84,6 +86,13 @@ def approve(pid: int):
     store.set_proposal_status(pid, "approved")
     if p["item_id"]:
         store.set_item_status(p["item_id"], "done")
+    # 审批落盘后,自动把该笔记重建进语义索引(失败不影响主流程)
+    try:
+        target = VAULT_DIR / name
+        if target.exists():
+            retrieval.index_note(target.name, target.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001
+        pass
     if kind == "link_suggestion":
         store.log_event(p["item_id"], "✅ 审批", f"提案 #{pid} 已批准:双链追加到 {name}")
     else:
@@ -106,7 +115,47 @@ def reject(pid: int):
 
 @app.get("/api/health")
 def health():
-    return {"ok": True, "llm": llm.llm_status()}
+    return {"ok": True, "llm": llm.llm_status(), "retrieval": retrieval.status()}
+
+
+@app.get("/api/search")
+def search(q: str = "", k: int = 5):
+    """语义检索 vault:本地嵌入,无需任何云 API。"""
+    if not q.strip():
+        return {"ok": False, "results": [], "reason": "empty query"}
+    return {"ok": True, "query": q, "results": retrieval.search(q, k=k)}
+
+
+@app.post("/api/reindex")
+def reindex():
+    """全量重建语义索引(手动兜底入口)。"""
+    return {"ok": True, **retrieval.reindex_vault()}
+
+
+class AskBody(BaseModel):
+    question: str = Field(min_length=1, max_length=500)
+
+
+@app.post("/api/ask")
+def ask(body: AskBody):
+    """RAG 问答:本地语义检索 top-k 小节 → LLM 生成带引用的回答。"""
+    hits = retrieval.search(body.question, k=5)
+    if not hits:
+        return {
+            "ok": True,
+            "answer": "知识库(或索引)里暂时找不到相关内容。可以先投递一些材料,或在简报页运行巡库后重建索引。",
+            "citations": [],
+        }
+    context = "\n\n".join(
+        f"[{i+1}] 《{h['title']}》小节「{h['section']}」:\n{h['snippet']}" for i, h in enumerate(hits)
+    )
+    answer = llm.ask_llm(
+        "你是洞察织机的知识问答员。仅依据下面给出的知识库片段回答问题,"
+        "并在回答末尾单独一行列出引用,格式:引用:[[笔记名]]。"
+        "知识库里没有的内容要明说,不要编造。",
+        f"知识库片段:\n{context}\n\n问题:{body.question}",
+    )
+    return {"ok": True, "answer": answer, "citations": list(dict.fromkeys(h["note"] for h in hits))}
 
 
 @app.post("/api/garden/run")

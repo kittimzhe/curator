@@ -99,7 +99,7 @@ curator/
 
 - [x] **P0** Core loop: inbox → 5-agent pipeline → approval → vault
 - [x] **P1a** 🌻 Gardener agent: vault scan for orphan/stale/thin notes, link suggestions through the same approval queue (auto-appends `[[wiki-links]]` on approval) + daily digest page
-- [ ] **P1c** Retrieval layer: local vector store (Chroma) + semantic search API + semantic Linker + Q&A box
+- [x] **P1c** Retrieval layer: local vector store (Chroma + local ONNX embeddings, no cloud API) + semantic search `/api/search` + semantic Linker + RAG Q&A `/api/ask` (with citations); approved notes are auto-indexed
 - [ ] **P1b** Knowledge graph view (link visualization), React frontend
 - [ ] **P2** Docker one-command deploy, capture endpoints (bookmarklet → browser extension → Telegram bot), demo GIF, public launch
 - [ ] **P3** Local model support (Ollama), checkpointer time-travel, RSS/email capture, multi-user

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 
 _BASE = os.environ.get("CURATOR_LLM_BASE_URL", "https://api.deepseek.com")
 _MODEL = os.environ.get("CURATOR_LLM_MODEL", "deepseek-chat")
@@ -81,4 +82,14 @@ def _mock_answer(system: str, user: str, expect_json: bool) -> str:
             {"verdict": "pass", "comment": "摘要与原文关键词覆盖充分(MOCK 判定)"},
             ensure_ascii=False,
         )
+    if "园丁" in system:
+        return json.dumps(
+            {"connections": [], "reasons": []},  # 园丁语义建议在真实模式下才有意义
+            ensure_ascii=False,
+        )
+    if "知识问答员" in system:
+        # MOCK 问答:从 user 里截取引用的笔记名,拼一个确定性回答
+        cited = re.findall(r"《([^》]+)》", user)
+        cites = " ".join(f"引用:[[{c}]]" for c in dict.fromkeys(cited) if not c.endswith("小节"))
+        return f"(MOCK 回答)根据知识库片段,这个问题与上述 {len(set(cited))} 条笔记相关:{cites}"
     return json.dumps({"ok": True}, ensure_ascii=False) if expect_json else "MOCK 回复"
