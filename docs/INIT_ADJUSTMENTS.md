@@ -32,3 +32,10 @@
 - 官网域名：`insightloomapp.com`
 - 资产文件：`insightloom` 前缀
 - 历史兼容命名（暂不动）：仓库目录名 `curator`、环境变量 `CURATOR_*`
+
+## 部署记录(2026-09-17)
+
+- EdgeOne Makers 项目:`insightloom`(ID makers-6niwnjzzqx2j),GitHub 导入 `kittimzhe/insightloom`@main,根目录 `site/`,输出 `./`
+- 默认域名:`insightloom-dl0kzqhb.edgeone.cool`(HTTPS ✓;**裸链接受合规限制仅 3 小时预览**,长期公开访问需绑自定义域名)
+- 每次推送 main 自动重新部署(已验证构建链路:克隆→安装→构建→部署 17s)
+- 待办升级为高优先:购买 `insightloomapp.com` → 腾讯云 ICP 备案 → EdgeOne「域名管理」绑定
