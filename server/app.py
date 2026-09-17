@@ -132,6 +132,56 @@ def reindex():
     return {"ok": True, **retrieval.reindex_vault()}
 
 
+@app.get("/api/graph")
+def graph():
+    """知识图谱:vault 全量笔记为节点,[[wiki-link]] 为边;未命中的链接单独返回。
+
+    供前端图谱视图(力导向图)消费;纯本地解析,无任何外部依赖。
+    """
+    import re
+
+    files = sorted(VAULT_DIR.glob("*.md"))
+    nodes = []
+    for f in files:
+        first = ""
+        try:
+            first = next(
+                (ln.lstrip("# ").strip() for ln in f.read_text(encoding="utf-8").splitlines() if ln.startswith("# ")),
+                f.stem,
+            )
+        except OSError:
+            first = f.stem
+        nodes.append({"id": f.stem, "file": f.name, "title": first or f.stem})
+
+    known = {n["id"] for n in nodes}
+    links: list[dict] = []
+    unresolved: list[dict] = []
+    for f in files:
+        try:
+            text = f.read_text(encoding="utf-8")
+        except OSError:
+            continue
+        for target in dict.fromkeys(re.findall(r"\[\[([^\]|#]+)", text)):
+            target = target.strip()
+            if not target:
+                continue
+            if target == f.stem:
+                continue
+            if target in known:
+                links.append({"source": f.stem, "target": target})
+            else:
+                unresolved.append({"from": f.stem, "to": target})
+
+    degree = {n["id"]: 0 for n in nodes}
+    for l in links:
+        degree[l["source"]] += 1
+        degree[l["target"]] += 1
+    for n in nodes:
+        n["degree"] = degree[n["id"]]
+
+    return {"ok": True, "nodes": nodes, "links": links, "unresolved": unresolved}
+
+
 class AskBody(BaseModel):
     question: str = Field(min_length=1, max_length=500)
 

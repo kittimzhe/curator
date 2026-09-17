@@ -269,10 +269,12 @@
     border-color: rgba(100, 116, 139, .65) !important;
   }
   body.dark-theme #tab-workbench:not(.bg-sky-600),
+  body.dark-theme #tab-graph:not(.bg-sky-600),
   body.dark-theme #tab-digest:not(.bg-sky-600) {
     color: #94a3b8 !important;
   }
   body.dark-theme #tab-workbench:not(.bg-sky-600):hover,
+  body.dark-theme #tab-graph:not(.bg-sky-600):hover,
   body.dark-theme #tab-digest:not(.bg-sky-600):hover {
     color: #e2e8f0 !important;
     background: rgba(30, 41, 59, .85) !important;
@@ -331,6 +333,7 @@
     <div class="ml-auto flex items-center gap-2 text-xs">
       <div class="flex bg-white/85 border border-slate-300 rounded-full p-0.5 shadow-inner shadow-slate-200">
         <button id="tab-workbench" onclick="switchTab('workbench')" class="px-3 py-1 rounded-full bg-sky-600 text-white font-medium transition duration-200 shadow-sm shadow-sky-400/40">🛠 工作台</button>
+        <button id="tab-graph" onclick="switchTab('graph')" class="px-3 py-1 rounded-full text-slate-500 hover:text-slate-700 transition duration-200">🕸 图谱</button>
         <button id="tab-digest" onclick="switchTab('digest')" class="px-3 py-1 rounded-full text-slate-500 hover:text-slate-700 transition duration-200">🌻 今日简报</button>
       </div>
       <button id="theme-toggle" class="theme-toggle" type="button" title="点击切换: 浅色 / 深色 / 跟随系统">🌙 深色</button>
@@ -469,6 +472,31 @@
       <h2 class="font-semibold mb-3">🏷️ 高频标签</h2>
       <div id="digest-tags" class="flex flex-wrap gap-2"></div>
       <p class="text-xs text-slate-600 mt-4 leading-relaxed">巡库发现会列在左侧;双链建议会进入馆长审批台,批准后自动追加到既有笔记。</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 图谱视图 ============ -->
+<div id="view-graph" class="hidden relative z-10 max-w-7xl mx-auto px-4 py-6 space-y-4">
+  <div class="flex items-center gap-3 flex-wrap">
+    <h2 class="font-semibold">🕸 知识图谱</h2>
+    <span class="text-xs text-slate-500" id="graph-meta">加载中…</span>
+    <button onclick="initGraph(true)" class="ml-auto text-xs btn-secondary">↻ 刷新</button>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-2 glass-panel panel-hover rounded-2xl p-2 relative">
+      <canvas id="graph-canvas" class="w-full rounded-xl cursor-grab" style="height:520px"></canvas>
+      <p class="absolute bottom-3 left-4 text-[11px] text-slate-400 pointer-events-none">拖拽节点重排 · 点击节点查看关联 · 空白处点击取消选中</p>
+    </div>
+    <div class="glass-panel panel-hover rounded-2xl p-4 space-y-3 self-start">
+      <h3 class="font-semibold text-sm" id="graph-info-title">选中一个节点</h3>
+      <div id="graph-info" class="space-y-3 text-sm">
+        <p class="text-xs text-slate-500 leading-relaxed">节点 = 已入库笔记;连线 = [[双链]]。点大小随连接数增长。未入库的链接目标会列在下方。</p>
+      </div>
+      <div id="graph-unresolved" class="pt-2 border-t border-slate-200/60 hidden">
+        <p class="text-xs font-semibold text-amber-600 mb-1">⚠️ 未命中目标(孤链)</p>
+        <div id="graph-unresolved-list" class="space-y-1 text-xs text-slate-500"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -818,10 +846,160 @@ async function act(pid, action){
 function switchTab(tab){
   $('view-workbench').classList.toggle('hidden', tab !== 'workbench');
   $('view-digest').classList.toggle('hidden', tab !== 'digest');
+  $('view-graph').classList.toggle('hidden', tab !== 'graph');
   $('tab-workbench').className = TAB_BASE + (tab==='workbench' ? ' bg-sky-600 text-white shadow-sm shadow-sky-400/40' : ' text-slate-500 hover:text-slate-700 hover:bg-slate-100');
+  $('tab-graph').className = TAB_BASE + (tab==='graph' ? ' bg-sky-600 text-white shadow-sm shadow-sky-400/40' : ' text-slate-500 hover:text-slate-700 hover:bg-slate-100');
   $('tab-digest').className = TAB_BASE + (tab==='digest' ? ' bg-sky-600 text-white shadow-sm shadow-sky-400/40' : ' text-slate-500 hover:text-slate-700 hover:bg-slate-100');
   if (tab === 'digest') fetchDigest();
+  if (tab === 'graph') { if (!G.inited) initGraph(); else if (!G.raf) loopGraph(); }
 }
+
+/* ============ 知识图谱:canvas 力导向 ============ */
+const G = { nodes: [], links: [], byId: {}, unresolved: [], inited: false, sel: null, hover: null, drag: null, raf: 0, alpha: 0.4, dpr: 1, bound: false };
+
+async function initGraph(){
+  const cv = $('graph-canvas');
+  try {
+    const r = await fetch('/api/graph').then(x => x.json());
+    if (!r.ok || !r.nodes.length) throw new Error(r.reason || 'empty');
+    G.nodes = r.nodes.map((n, i) => {
+      const a = (i / Math.max(1, r.nodes.length)) * Math.PI * 2;
+      return { ...n, x: 0.5 + Math.cos(a) * (0.2 + 0.012 * n.degree), y: 0.5 + Math.sin(a) * (0.28 + 0.015 * n.degree), vx: 0, vy: 0, r: 7 + Math.min(14, n.degree * 2.4) };
+    });
+    G.byId = {}; G.nodes.forEach(n => G.byId[n.id] = n);
+    G.links = r.links.map(l => ({ s: G.byId[l.source], t: G.byId[l.target] })).filter(l => l.s && l.t);
+    G.unresolved = r.unresolved || [];
+    G.sel = null; G.alpha = 0.5; G.inited = true;
+    renderGraphInfo();
+    $('graph-meta').textContent = `${G.nodes.length} 篇笔记 · ${G.links.length} 条双链`;
+    const ul = $('graph-unresolved-list');
+    ul.innerHTML = G.unresolved.slice(0, 12).map(u => `<div>「${esc(u.from)}」→ <span class="text-amber-600">${esc(u.to)}</span></div>`).join('');
+    $('graph-unresolved').classList.toggle('hidden', !G.unresolved.length);
+    if (!G.bound) { bindGraphEvents(cv); G.bound = true; }
+    if (!G.raf) loopGraph();
+  } catch (e) {
+    $('graph-meta').textContent = '图谱加载失败:' + (e.message || e);
+  }
+}
+
+function bindGraphEvents(cv){
+  const pos = ev => { const b = cv.getBoundingClientRect(); return { x: (ev.clientX - b.left) / b.width, y: (ev.clientY - b.top) / b.height }; };
+  const hit = p => {
+    const W = cv.clientWidth, H = cv.clientHeight;
+    let best = null, bd = 1e9;
+    for (const n of G.nodes) {
+      const dx = n.x * W - p.x * W, dy = n.y * H - p.y * H, d = dx * dx + dy * dy;
+      if (d < (n.r + 6) ** 2 && d < bd) { bd = d; best = n; }
+    }
+    return best;
+  };
+  cv.addEventListener('pointerdown', ev => {
+    const p = pos(ev); const n = hit(p);
+    if (n) { G.drag = { n, moved: 0 }; cv.setPointerCapture(ev.pointerId); }
+    else { G.sel = null; renderGraphInfo(); }
+    G.alpha = Math.max(G.alpha, 0.25);
+  });
+  cv.addEventListener('pointermove', ev => {
+    const p = pos(ev);
+    if (G.drag) { G.drag.n.x = Math.max(0.02, Math.min(0.98, p.x)); G.drag.n.y = Math.max(0.03, Math.min(0.97, p.y)); G.drag.n.vx = G.drag.n.vy = 0; G.drag.moved++; }
+    else { G.hover = hit(p); cv.style.cursor = G.hover ? 'pointer' : 'grab'; }
+  });
+  cv.addEventListener('pointerup', () => {
+    if (G.drag && G.drag.moved < 4) { G.sel = G.drag.n; renderGraphInfo(); }
+    G.drag = null;
+  });
+  window.addEventListener('resize', () => { if (G.inited && G.raf) fitGraphCanvas(); });
+}
+
+function fitGraphCanvas(){ const cv = $('graph-canvas'); G.dpr = window.devicePixelRatio || 1; cv.width = cv.clientWidth * G.dpr; cv.height = cv.clientHeight * G.dpr; }
+
+function loopGraph(){
+  const cv = $('graph-canvas');
+  const step = () => {
+    if ($('view-graph').classList.contains('hidden')) { G.raf = 0; return; }
+    fitGraphCanvas();
+    tickGraph(cv.clientWidth, cv.clientHeight);
+    drawGraph(cv);
+    G.raf = requestAnimationFrame(step);
+  };
+  G.raf = requestAnimationFrame(step);
+}
+
+function tickGraph(W, H){
+  G.alpha = Math.max(0.015, G.alpha * 0.995);
+  const a = G.alpha;
+  for (let i = 0; i < G.nodes.length; i++) for (let j = i + 1; j < G.nodes.length; j++) {
+    const n1 = G.nodes[i], n2 = G.nodes[j];
+    let dx = n2.x - n1.x, dy = n2.y - n1.y;
+    let d2 = dx * dx + dy * dy || 1e-6;
+    if (d2 > 0.25) continue;
+    const f = Math.min(0.05, 0.0024 / d2) * a, d = Math.sqrt(d2);
+    dx /= d; dy /= d;
+    n1.vx -= dx * f; n1.vy -= dy * f; n2.vx += dx * f; n2.vy += dy * f;
+  }
+  for (const l of G.links) {
+    const dx = l.t.x - l.s.x, dy = l.t.y - l.s.y, d = Math.hypot(dx, dy) || 1e-6;
+    const f = (d - 0.17) * 0.07 * a;
+    const ux = dx / d, uy = dy / d;
+    l.s.vx += ux * f; l.s.vy += uy * f; l.t.vx -= ux * f; l.t.vy -= uy * f;
+  }
+  for (const n of G.nodes) {
+    n.vx += (0.5 - n.x) * 0.004 * a; n.vy += (0.5 - n.y) * 0.006 * a;
+    n.vx *= 0.86; n.vy *= 0.86;
+    if (G.drag && G.drag.n === n) continue;
+    n.x = Math.min(0.98, Math.max(0.02, n.x + n.vx)); n.y = Math.min(0.97, Math.max(0.03, n.y + n.vy));
+  }
+}
+
+function drawGraph(cv){
+  const ctx = cv.getContext('2d'); const W = cv.clientWidth, H = cv.clientHeight;
+  const dark = document.body.classList.contains('dark-theme');
+  ctx.setTransform(G.dpr, 0, 0, G.dpr, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const neigh = new Set();
+  if (G.sel) { neigh.add(G.sel.id); for (const l of G.links) { if (l.s === G.sel) neigh.add(l.t.id); if (l.t === G.sel) neigh.add(l.s.id); } }
+  for (const l of G.links) {
+    const on = !G.sel || (l.s === G.sel || l.t === G.sel);
+    ctx.strokeStyle = on ? (dark ? 'rgba(56,189,248,.75)' : 'rgba(14,165,233,.6)') : (dark ? 'rgba(148,163,184,.12)' : 'rgba(100,116,139,.16)');
+    ctx.lineWidth = on ? 1.7 : 1;
+    ctx.beginPath(); ctx.moveTo(l.s.x * W, l.s.y * H); ctx.lineTo(l.t.x * W, l.t.y * H); ctx.stroke();
+  }
+  for (const n of G.nodes) {
+    const dim = G.sel && !neigh.has(n.id);
+    const R = n.r * (G.hover === n || G.sel === n ? 1.22 : 1);
+    const g = ctx.createRadialGradient(n.x * W - R * 0.3, n.y * H - R * 0.3, 1, n.x * W, n.y * H, R);
+    if (dim) { g.addColorStop(0, dark ? '#475569' : '#94a3b8'); g.addColorStop(1, dark ? '#1e293b' : '#cbd5e1'); }
+    else if (n.degree >= 4) { g.addColorStop(0, '#7dd3fc'); g.addColorStop(1, '#0284c7'); }
+    else { g.addColorStop(0, '#a5b4fc'); g.addColorStop(1, '#4f46e5'); }
+    ctx.globalAlpha = dim ? 0.35 : 1;
+    ctx.beginPath(); ctx.arc(n.x * W, n.y * H, R, 0, 7); ctx.fillStyle = g; ctx.fill();
+    if (G.sel === n) { ctx.beginPath(); ctx.arc(n.x * W, n.y * H, R + 3.5, 0, 7); ctx.strokeStyle = dark ? '#38bdf8' : '#0ea5e9'; ctx.lineWidth = 2; ctx.stroke(); }
+    ctx.font = `${G.sel === n ? '600 ' : ''}${11 + Math.min(4, n.degree)}px system-ui, -apple-system, "PingFang SC", sans-serif`;
+    ctx.fillStyle = dim ? (dark ? 'rgba(148,163,184,.4)' : 'rgba(100,116,139,.4)') : (dark ? '#e2e8f0' : '#334155');
+    const label = n.title.length > 12 ? n.title.slice(0, 11) + '…' : n.title;
+    ctx.fillText(label, n.x * W - ctx.measureText(label).width / 2, n.y * H + R + 14);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function renderGraphInfo(){
+  const box = $('graph-info'), title = $('graph-info-title');
+  if (!G.sel) {
+    title.textContent = '选中一个节点';
+    box.innerHTML = '<p class="text-xs text-slate-500 leading-relaxed">节点 = 已入库笔记;连线 = [[双链]]。点大小随连接数增长,亮蓝 = 枢纽节点。未入库的链接目标会列在下方。</p>';
+    return;
+  }
+  const n = G.sel;
+  const neighbors = G.links.filter(l => l.s === n || l.t === n).map(l => (l.s === n ? l.t : l.s)).sort((a, b) => b.degree - a.degree);
+  title.textContent = n.title;
+  box.innerHTML = `
+    <p class="text-xs text-slate-500">${esc(n.file)} · ${n.degree} 条连接</p>
+    <div class="flex flex-wrap gap-1.5 pt-1">
+      ${neighbors.map(m => `<button onclick="focusNode(this.dataset.id)" data-id="${esc(m.id)}" class="text-xs px-2 py-1 rounded-lg border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-700 dark:border-sky-800 dark:bg-sky-900/30 dark:text-sky-300 transition">${esc(m.title)}</button>`).join('') || '<span class="text-xs text-slate-400">暂无邻居(孤岛笔记)</span>'}
+    </div>`;
+}
+
+function focusNode(id){ const n = G.byId[id]; if (n) { G.sel = n; renderGraphInfo(); G.alpha = Math.max(G.alpha, 0.2); } }
 
 async function fetchDigest(){
   try {
