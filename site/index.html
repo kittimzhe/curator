@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>洞察织机 InsightLoom — 把收藏变成可用知识</title>
+<meta name="description" content="洞察织机(InsightLoom)是自托管的 AI 知识治理工作台:一队看得见的 Agent 替你分拣、摘要、互链、对抗审查,你审批后落盘为 Markdown 知识资产,本地语义检索随问随答。">
+<meta name="keywords" content="洞察织机,InsightLoom,知识管理,AI 笔记,自托管,知识库,Markdown,Obsidian,LangGraph,multi-agent">
+<meta name="theme-color" content="#0ea5e9">
+<link rel="canonical" href="https://insightloomapp.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="洞察织机 InsightLoom">
+<meta property="og:title" content="洞察织机 InsightLoom — 把收藏变成可用知识">
+<meta property="og:description" content="一队看得见的 AI 图书管理员:分拣、摘要、互链、对抗审查,你审批后才落盘。本地语义检索,RAG 问答带引用。">
+<meta property="og:url" content="https://insightloomapp.com/">
+<meta property="og:image" content="https://insightloomapp.com/assets/og-image-insightloom-minimal.png">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="洞察织机 InsightLoom — 把收藏变成可用知识">
+<meta name="twitter:description" content="可见 multi-agent 治理流水线 + 人工审批 + 零锁定 Markdown + 本地语义检索。">
+<meta name="twitter:image" content="https://insightloomapp.com/assets/og-image-insightloom-minimal.png">
+<link rel="icon" type="image/svg+xml" href="assets/favicon-insightloom.svg">
+<script src="assets/tailwind.js"></script>
+<style>
+  body {
+    background:
+      radial-gradient(980px 460px at 8% -10%, rgba(56, 189, 248, .18), transparent 60%),
+      radial-gradient(840px 420px at 96% -8%, rgba(129, 140, 248, .16), transparent 58%),
+      #f3f7ff;
+  }
+  .bg-orb { position: fixed; border-radius: 9999px; filter: blur(64px); pointer-events: none; z-index: 0; opacity: .28; }
+  .orb-left { width: 320px; height: 320px; left: -110px; top: 100px; background: rgba(56,189,248,.18); }
+  .orb-right { width: 360px; height: 360px; right: -120px; top: 220px; background: rgba(129,140,248,.16); }
+  .brand-grad { background: linear-gradient(120deg,#38bdf8 0%,#818cf8 55%,#c084fc 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .glass-panel { background: rgba(255,255,255,.78); border: 1px solid rgba(148,163,184,.35); box-shadow: 0 14px 30px rgba(148,163,184,.2); backdrop-filter: blur(10px); }
+  .hero-panel { background: linear-gradient(145deg, rgba(255,255,255,.96), rgba(241,245,255,.96)); border: 1px solid rgba(148,163,184,.3); box-shadow: 0 22px 42px rgba(148,163,184,.22); }
+  .btn-primary { background: linear-gradient(120deg,#0284c7,#6366f1 60%,#8b5cf6); color:#fff; border-radius:.65rem; padding:.55rem 1.05rem; font-size:.875rem; font-weight:600; transition:.2s; box-shadow:0 10px 24px rgba(37,99,235,.35); display:inline-block; }
+  .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.06); }
+  .btn-secondary { background: rgba(255,255,255,.88); color:#334155; border:1px solid rgba(148,163,184,.45); border-radius:.65rem; padding:.55rem 1.05rem; font-size:.875rem; transition:.2s; display:inline-block; }
+  .btn-secondary:hover { color:#0f172a; border-color: rgba(56,189,248,.42); background: rgba(255,255,255,.98); }
+  .feature-tile { border:1px solid rgba(148,163,184,.38); background: rgba(255,255,255,.74); border-radius:.85rem; padding:.85rem; color:#475569; transition:.2s; }
+  .feature-tile:hover { border-color: rgba(125,211,252,.45); color:#334155; transform: translateY(-1px); }
+  .layer-chip { border:1px solid rgba(148,163,184,.45); background:rgba(255,255,255,.85); border-radius:.6rem; padding:.45rem .7rem; font-size:.78rem; color:#475569; }
+  .code-block { background:#0b1220; color:#cbd5e1; border-radius:.75rem; padding:1rem 1.1rem; font-size:.8rem; font-family:ui-monospace,Menlo,monospace; overflow-x:auto; line-height:1.7; }
+  .code-block .c1{color:#7dd3fc} .code-block .c2{color:#86efac} .code-block .c3{color:#fcd34d}
+  table.cmp { border-collapse: separate; border-spacing: 0; }
+  table.cmp th, table.cmp td { padding:.5rem .8rem; font-size:.8rem; border-bottom:1px solid rgba(148,163,184,.25); text-align:center; }
+  table.cmp th:first-child, table.cmp td:first-child { text-align:left; }
+</style>
+</head>
+<body class="text-slate-800 min-h-screen antialiased relative">
+<div class="bg-orb orb-left"></div><div class="bg-orb orb-right"></div>
+
+<header class="border-b border-slate-300/70 bg-white/78 backdrop-blur-xl sticky top-0 z-40">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
+    <div class="w-8 h-8 rounded-lg overflow-hidden shadow-sm ring-1 ring-sky-200/70 bg-white/70 grid place-items-center">
+      <img src="assets/icon-insightloom-mark.svg" alt="洞察织机图标" class="w-7 h-7 object-contain">
+    </div>
+    <div>
+      <span class="text-lg font-bold tracking-wide brand-grad">洞察织机</span>
+      <span class="ml-2 text-xs text-slate-500">InsightLoom</span>
+    </div>
+    <nav class="ml-auto flex items-center gap-3 text-sm">
+      <a href="#demo" class="text-slate-600 hover:text-sky-700 transition hidden sm:inline">演示</a>
+      <a href="#quickstart" class="text-slate-600 hover:text-sky-700 transition hidden sm:inline">快速开始</a>
+      <a href="https://github.com/kittimzhe/insightloom" target="_blank" class="btn-secondary">GitHub ⭐</a>
+    </nav>
+  </div>
+</header>
+
+<main class="relative z-10 max-w-5xl mx-auto px-4">
+
+  <!-- Hero -->
+  <section class="pt-10 pb-6">
+    <div class="hero-panel rounded-2xl p-7 md:p-9">
+      <p class="text-xs text-slate-500 mb-2">自托管 · 开源 · 数据永远是你的</p>
+      <h1 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 leading-tight">把收藏编织成<br class="md:hidden">可行动的洞察</h1>
+      <p class="text-sm md:text-base text-slate-600 mt-4 max-w-2xl leading-relaxed">
+        文章、论文、链接丢进收件箱,一队<b>看得见的 Agent</b> 替你分拣、摘要、互链、对抗审查;
+        你一键审批,沉淀为 Markdown 知识资产——本地语义检索,随问随答,带引用。
+      </p>
+      <div class="flex flex-wrap gap-2.5 mt-6">
+        <a href="https://github.com/kittimzhe/insightloom" target="_blank" class="btn-primary">GitHub 开源仓库</a>
+        <a href="#quickstart" class="btn-secondary">Docker 一键部署</a>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mt-7 text-xs">
+        <div class="feature-tile">👀 <b>流水线可见</b><br>五个 Agent 实时处理,每一步都看得见</div>
+        <div class="feature-tile">⚔️ <b>对抗审查</b><br>质疑员红队检查,过度概括无处遁形</div>
+        <div class="feature-tile">✅ <b>人审批落盘</b><br>AI 只提提案,不批不写一个字节</div>
+        <div class="feature-tile">📄 <b>零锁定</b><br>纯 Markdown,Obsidian 直接打开</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="py-8">
+    <h2 class="text-xl font-bold text-slate-900 mb-1">30 秒看懂</h2>
+    <p class="text-sm text-slate-500 mb-4">语义检索 → RAG 问答 → 投递 → Agent 流水线 → 审批入库 → 自动进入可检索索引</p>
+    <div class="glass-panel rounded-2xl p-3">
+      <img src="assets/demo.gif" alt="洞察织机 InsightLoom 演示:检索、问答、投递、审批、入库全流程" class="rounded-xl w-full">
+    </div>
+  </section>
+
+  <!-- Architecture -->
+  <section class="py-8">
+    <h2 class="text-xl font-bold text-slate-900 mb-1">五层架构</h2>
+    <p class="text-sm text-slate-500 mb-4">知识的"进、治、存、查、用"全闭环</p>
+    <div class="glass-panel rounded-2xl p-5 space-y-2.5">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-slate-400 w-14">采集</span><span class="layer-chip">📥 收件箱</span><span class="layer-chip">🔌 API</span><span class="layer-chip">浏览器插件 🔜</span><span class="layer-chip">TG bot 🔜</span>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-slate-400 w-14">治理</span><span class="layer-chip">🏷️ 分类</span><span class="layer-chip">📝 摘要 ∥ 🔗 互链</span><span class="layer-chip">⚔️ 对抗审查</span><span class="layer-chip">✋ 人工审批</span><span class="layer-chip">🌻 园丁巡库</span>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-slate-400 w-14">存储</span><span class="layer-chip">📄 Markdown + [[双链]]</span><span class="layer-chip">Obsidian 兼容</span>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-slate-400 w-14">检索</span><span class="layer-chip">🔍 本地语义检索(小节级)</span><span class="layer-chip">✨ RAG 问答带引用</span>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="text-xs text-slate-400 w-14">界面</span><span class="layer-chip">🛠 工作台</span><span class="layer-chip">🌻 每日简报</span><span class="layer-chip">🕸 知识图谱 🔜</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quickstart -->
+  <section id="quickstart" class="py-8">
+    <h2 class="text-xl font-bold text-slate-900 mb-1">三步跑起来</h2>
+    <p class="text-sm text-slate-500 mb-4">默认 MOCK 模式零配置;接真实模型只需一个环境变量</p>
+    <div class="code-block">
+<span class="c3"># 1. 克隆</span><br>
+<span class="c1">git</span> clone https://github.com/kittimzhe/insightloom.git <span class="c2">&amp;&amp;</span> <span class="c1">cd</span> insightloom<br><br>
+<span class="c3"># 2. 一键起(内置 MOCK 模式,无需任何 Key)</span><br>
+<span class="c1">docker</span> compose up -d<br><br>
+<span class="c3"># 3. 打开工作台</span><br>
+open http://127.0.0.1:8300&nbsp;&nbsp;<span class="c3"># 投递 → 审批 → 检索,全流程可用</span><br><br>
+<span class="c3"># 想接真实 LLM(DeepSeek/OpenAI 兼容/Ollama)?</span><br>
+<span class="c1">echo</span> <span class="c2">"CURATOR_LLM_API_KEY=sk-xxx"</span> &gt;&gt; .env <span class="c2">&amp;&amp;</span> <span class="c1">docker</span> compose up -d
+    </div>
+  </section>
+
+  <!-- Comparison -->
+  <section class="py-8">
+    <h2 class="text-xl font-bold text-slate-900 mb-1">和现有工具的差异</h2>
+    <p class="text-sm text-slate-500 mb-4">不是"再一个笔记工具",而是"知识入库前的治理系统"</p>
+    <div class="glass-panel rounded-2xl p-5 overflow-x-auto">
+      <table class="cmp w-full">
+        <thead><tr class="text-slate-500"><th>维度</th><th>笔记工具</th><th>RAG/检索工具</th><th class="text-sky-700">洞察织机</th></tr></thead>
+        <tbody>
+          <tr><td>入库前治理</td><td>✗</td><td>✗</td><td class="text-emerald-600 font-medium">✓ 5-Agent 流水线</td></tr>
+          <tr><td>过程可见</td><td>✗</td><td>✗</td><td class="text-emerald-600 font-medium">✓ 实时事件流</td></tr>
+          <tr><td>人审落盘</td><td>✗</td><td>✗</td><td class="text-emerald-600 font-medium">✓ 审批闸门</td></tr>
+          <tr><td>零锁定</td><td>部分</td><td>部分</td><td class="text-emerald-600 font-medium">✓ 纯 Markdown</td></tr>
+          <tr><td>质量闭环</td><td>✗</td><td>✗</td><td class="text-emerald-600 font-medium">✓ 对抗审查 + 巡库</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="py-10 text-center text-xs text-slate-500 space-y-1.5">
+    <p>洞察织机 InsightLoom · 开源协议 MIT · <a class="text-sky-700 hover:underline" href="https://github.com/kittimzhe/insightloom" target="_blank">github.com/kittimzhe/insightloom</a></p>
+    <p> 2026 参赛项目 · 自托管,数据永远是你的</p>
+  </footer>
+</main>
+</body>
+</html>
