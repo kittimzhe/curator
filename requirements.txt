@@ -1,7 +1,8 @@
- fastapi
- uvicorn[standard]
- langgraph
- langchain-core
- openai
- python-dotenv
- chromadb
+fastapi
+uvicorn[standard]
+langgraph
+langchain-core
+openai
+python-dotenv
+chromadb
+httpx
