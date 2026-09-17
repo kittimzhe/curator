@@ -1,4 +1,4 @@
-"""Curator 状态存储:SQLite(队列/事件/提案)+ vault Markdown 落盘。
+"""洞察织机(InsightLoom)状态存储:SQLite(队列/事件/提案)+ vault Markdown 落盘。
 
 设计原则:
 - 知识本体永远只是磁盘上的 Markdown 文件(vault/),零锁定,Obsidian 可直接打开

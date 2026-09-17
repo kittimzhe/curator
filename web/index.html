@@ -3,13 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Curator — 你的 AI 图书管理员团队</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏛️</text></svg>">
+<title>洞察织机 InsightLoom — 把收藏变成可用知识</title>
+<meta name="description" content="洞察织机（InsightLoom）是一个自托管知识工作台，把收藏的文章、论文与笔记自动治理为可复用、可审批、可追溯的知识资产。">
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1">
+<meta name="keywords" content="洞察织机,InsightLoom,知识管理,AI 笔记,知识库,自托管,知识工作台,Markdown,Obsidian">
+<meta name="theme-color" content="#0ea5e9">
+<link rel="canonical" href="https://insightloomapp.com/">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="洞察织机 InsightLoom">
+<meta property="og:title" content="洞察织机 InsightLoom — 把收藏变成可用知识">
+<meta property="og:description" content="把收藏的文章、论文与笔记自动治理为可复用、可审批、可追溯的知识资产。">
+<meta property="og:url" content="https://insightloomapp.com/">
+<meta property="og:image" content="https://insightloomapp.com/assets/og-image-insightloom-minimal.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="洞察织机 InsightLoom 品牌预览图">
+<meta property="og:locale" content="zh_CN">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="洞察织机 InsightLoom — 把收藏变成可用知识">
+<meta name="twitter:description" content="把收藏的文章、论文与笔记自动治理为可复用、可审批、可追溯的知识资产。">
+<meta name="twitter:image" content="https://insightloomapp.com/assets/og-image-insightloom-minimal.png">
+<meta name="twitter:image:alt" content="洞察织机 InsightLoom 品牌预览图">
+
+<link rel="icon" type="image/svg+xml" href="/assets/favicon-insightloom.svg">
 <script src="tailwind.js"></script>
 <style>
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
   ::-webkit-scrollbar-track { background: transparent; }
+
+  body {
+    background:
+      radial-gradient(980px 460px at 8% -10%, rgba(56, 189, 248, .18), transparent 60%),
+      radial-gradient(840px 420px at 96% -8%, rgba(129, 140, 248, .16), transparent 58%),
+      #f3f7ff;
+  }
+
+  .bg-orb {
+    position: fixed;
+    border-radius: 9999px;
+    filter: blur(64px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: .28;
+  }
+  .orb-left {
+    width: 320px;
+    height: 320px;
+    left: -110px;
+    top: 100px;
+    background: rgba(56, 189, 248, .18);
+  }
+  .orb-right {
+    width: 360px;
+    height: 360px;
+    right: -120px;
+    top: 220px;
+    background: rgba(129, 140, 248, .16);
+  }
 
   .fade-in { animation: fadeIn .35s ease both; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
@@ -25,27 +79,262 @@
 
   .toast { animation: toastIn .3s ease both; }
   @keyframes toastIn { from { opacity: 0; transform: translateX(24px);} to { opacity: 1; transform: none;} }
+
+  .glass-panel {
+    background: rgba(255, 255, 255, .78);
+    border: 1px solid rgba(148, 163, 184, .35);
+    box-shadow: 0 14px 30px rgba(148, 163, 184, .2);
+    backdrop-filter: blur(10px);
+  }
+  .panel-hover {
+    transition: border-color .22s ease, transform .22s ease, box-shadow .22s ease;
+  }
+  .panel-hover:hover {
+    transform: translateY(-1px);
+    border-color: rgba(99, 102, 241, .28);
+    box-shadow: 0 16px 34px rgba(148, 163, 184, .24);
+  }
+  .hero-panel {
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, .96), rgba(241, 245, 255, .96));
+    border: 1px solid rgba(148, 163, 184, .3);
+    box-shadow: 0 22px 42px rgba(148, 163, 184, .22);
+  }
+  .btn-primary {
+    background: linear-gradient(120deg, #0284c7, #6366f1 60%, #8b5cf6);
+    color: #fff;
+    border-radius: .65rem;
+    padding: .5rem 1rem;
+    font-size: .875rem;
+    font-weight: 600;
+    transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    box-shadow: 0 10px 24px rgba(37, 99, 235, .35);
+  }
+  .btn-primary:hover { transform: translateY(-1px); filter: brightness(1.06); }
+  .btn-secondary {
+    background: rgba(255, 255, 255, .88);
+    color: #334155;
+    border: 1px solid rgba(148, 163, 184, .45);
+    border-radius: .65rem;
+    padding: .5rem 1rem;
+    font-size: .875rem;
+    transition: all .2s ease;
+  }
+  .btn-secondary:hover { color: #0f172a; border-color: rgba(56, 189, 248, .42); background: rgba(255, 255, 255, .98); }
+  .input-field {
+    width: 100%;
+    background: rgba(255, 255, 255, .94);
+    border: 1px solid rgba(148, 163, 184, .5);
+    border-radius: .65rem;
+    padding: .52rem .72rem;
+    font-size: .875rem;
+    color: #0f172a;
+    transition: border-color .18s ease, box-shadow .18s ease;
+  }
+  .input-field::placeholder { color: #94a3b8; }
+  .input-field:focus {
+    outline: none;
+    border-color: rgba(56, 189, 248, .8);
+    box-shadow: 0 0 0 1px rgba(56, 189, 248, .35), 0 0 0 6px rgba(14, 116, 144, .14);
+  }
+  .feature-tile {
+    border: 1px solid rgba(148, 163, 184, .38);
+    background: rgba(255, 255, 255, .74);
+    border-radius: .85rem;
+    padding: .75rem;
+    color: #475569;
+    transition: all .2s ease;
+  }
+  .feature-tile:hover {
+    border-color: rgba(125, 211, 252, .45);
+    color: #334155;
+    transform: translateY(-1px);
+  }
+  .soft-divider {
+    height: 1px;
+    background: linear-gradient(to right, rgba(148, 163, 184, 0), rgba(148, 163, 184, .7), rgba(148, 163, 184, 0));
+  }
+
+  .theme-toggle {
+    background: rgba(255, 255, 255, .9);
+    color: #334155;
+    border: 1px solid rgba(148, 163, 184, .45);
+    border-radius: 9999px;
+    padding: .2rem .62rem;
+    font-size: .72rem;
+    transition: all .2s ease;
+  }
+  .theme-toggle:hover {
+    color: #0f172a;
+    border-color: rgba(56, 189, 248, .45);
+    background: rgba(255, 255, 255, .98);
+  }
+
+  body.dark-theme {
+    color: #e2e8f0;
+    background:
+      radial-gradient(900px 430px at 8% -10%, rgba(56, 189, 248, .16), transparent 60%),
+      radial-gradient(760px 360px at 96% -8%, rgba(129, 140, 248, .14), transparent 58%),
+      #0b1220;
+  }
+  body.dark-theme .orb-left { background: rgba(56, 189, 248, .22); }
+  body.dark-theme .orb-right { background: rgba(129, 140, 248, .2); }
+  body.dark-theme header {
+    border-color: rgba(71, 85, 105, .65) !important;
+    background: rgba(15, 23, 42, .78) !important;
+  }
+  body.dark-theme .theme-toggle {
+    background: rgba(30, 41, 59, .9);
+    color: #cbd5e1;
+    border-color: rgba(100, 116, 139, .65);
+  }
+  body.dark-theme .theme-toggle:hover {
+    color: #e2e8f0;
+    border-color: rgba(125, 211, 252, .45);
+    background: rgba(15, 23, 42, .96);
+  }
+  body.dark-theme .glass-panel {
+    background: rgba(17, 27, 46, .78);
+    border-color: rgba(94, 113, 148, .35);
+    box-shadow: 0 14px 32px rgba(5, 10, 20, .34);
+  }
+  body.dark-theme .hero-panel {
+    background: linear-gradient(145deg, rgba(22, 34, 61, .94), rgba(12, 20, 37, .92));
+    border-color: rgba(129, 140, 248, .24);
+    box-shadow: 0 22px 42px rgba(6, 12, 24, .48);
+  }
+  body.dark-theme .feature-tile {
+    border-color: rgba(87, 104, 136, .48);
+    background: rgba(15, 24, 42, .64);
+    color: #94a3b8;
+  }
+  body.dark-theme .feature-tile:hover {
+    border-color: rgba(125, 211, 252, .45);
+    color: #cbd5e1;
+  }
+  body.dark-theme .btn-secondary {
+    background: rgba(26, 39, 66, .85);
+    color: #cbd5e1;
+    border-color: rgba(103, 126, 168, .46);
+  }
+  body.dark-theme .btn-secondary:hover {
+    color: #e2e8f0;
+    border-color: rgba(125, 211, 252, .45);
+    background: rgba(17, 27, 46, .92);
+  }
+  body.dark-theme .input-field {
+    background: rgba(10, 18, 34, .86);
+    border-color: rgba(84, 103, 136, .55);
+    color: #e2e8f0;
+  }
+  body.dark-theme .input-field::placeholder { color: #64748b; }
+  body.dark-theme .text-slate-900 { color: #f1f5f9 !important; }
+  body.dark-theme .text-slate-800 { color: #e2e8f0 !important; }
+  body.dark-theme .text-slate-700 { color: #cbd5e1 !important; }
+  body.dark-theme .text-slate-600 { color: #94a3b8 !important; }
+  body.dark-theme .text-slate-500 { color: #94a3b8 !important; }
+  body.dark-theme .bg-white\/85,
+  body.dark-theme .bg-white\/88,
+  body.dark-theme .bg-white\/90,
+  body.dark-theme .bg-white\/70,
+  body.dark-theme .bg-white\/78,
+  body.dark-theme .bg-white,
+  body.dark-theme .bg-slate-100,
+  body.dark-theme .bg-amber-50\/55 {
+    background: rgba(15, 23, 42, .82) !important;
+  }
+  body.dark-theme .border-slate-200,
+  body.dark-theme .border-slate-300 {
+    border-color: rgba(100, 116, 139, .68) !important;
+  }
+  body.dark-theme .bg-sky-100 { background: rgba(2, 132, 199, .2) !important; color: #7dd3fc !important; }
+  body.dark-theme .bg-amber-100 { background: rgba(245, 158, 11, .2) !important; color: #fcd34d !important; }
+  body.dark-theme .bg-emerald-100 { background: rgba(16, 185, 129, .2) !important; color: #86efac !important; }
+  body.dark-theme .bg-rose-100 { background: rgba(244, 63, 94, .2) !important; color: #fda4af !important; }
+  body.dark-theme .border-amber-300 { border-color: rgba(245, 158, 11, .45) !important; }
+  body.dark-theme #live-dot { background: rgba(6, 78, 59, .6) !important; border-color: rgba(16, 185, 129, .45) !important; color: #6ee7b7 !important; }
+  body.dark-theme #stagebar .h-px { background: rgba(100, 116, 139, .72) !important; }
+  body.dark-theme #stagebar > span,
+  body.dark-theme #stagebar .rounded-full {
+    border-color: rgba(100, 116, 139, .7) !important;
+    background: rgba(15, 23, 42, .84) !important;
+    color: #94a3b8 !important;
+  }
+  body.dark-theme #stagebar .stage-active {
+    border-color: rgba(56, 189, 248, .7) !important;
+    background: rgba(8, 47, 73, .58) !important;
+    color: #7dd3fc !important;
+  }
+  body.dark-theme #llm-badge {
+    border-color: rgba(100, 116, 139, .65) !important;
+  }
+  body.dark-theme #tab-workbench:not(.bg-sky-600),
+  body.dark-theme #tab-digest:not(.bg-sky-600) {
+    color: #94a3b8 !important;
+  }
+  body.dark-theme #tab-workbench:not(.bg-sky-600):hover,
+  body.dark-theme #tab-digest:not(.bg-sky-600):hover {
+    color: #e2e8f0 !important;
+    background: rgba(30, 41, 59, .85) !important;
+  }
+
+  @media (max-width: 640px) {
+    .hero-panel {
+      padding: 1rem !important;
+    }
+    .hero-panel h2 {
+      font-size: 1.5rem !important;
+      line-height: 1.28 !important;
+    }
+    .hero-panel p {
+      font-size: .875rem !important;
+    }
+    .feature-tile {
+      padding: .65rem;
+    }
+    main.max-w-7xl {
+      gap: .85rem;
+      padding-top: 1rem;
+      padding-bottom: 1.1rem;
+    }
+    #items {
+      max-height: 13.5rem !important;
+    }
+    #events,
+    #proposals {
+      max-height: 24rem !important;
+    }
+    #stagebar {
+      padding-bottom: .15rem;
+    }
+  }
 </style>
 </head>
-<body class="bg-slate-950 text-slate-200 min-h-screen antialiased">
+<body class="text-slate-800 min-h-screen antialiased relative">
+
+<div class="bg-orb orb-left"></div>
+<div class="bg-orb orb-right"></div>
 
 <!-- Toast 栈 -->
 <div id="toasts" class="fixed top-4 right-4 z-50 space-y-2 w-72"></div>
 
 <!-- Header -->
-<header class="border-b border-slate-800/80 bg-slate-900/70 backdrop-blur sticky top-0 z-40">
+<header class="border-b border-slate-300/80 bg-white/78 backdrop-blur-xl sticky top-0 z-40">
   <div class="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
-    <div class="text-2xl drop-shadow-[0_0_12px_rgba(56,189,248,.45)]">🏛️</div>
+    <div class="w-8 h-8 rounded-lg overflow-hidden shadow-sm shadow-sky-300/40 ring-1 ring-sky-200/70 bg-white/70 grid place-items-center">
+      <img src="assets/icon-insightloom-mark.svg" alt="洞察织机图标" class="w-7 h-7 object-contain">
+    </div>
     <div>
-      <h1 class="text-lg font-bold tracking-wide brand-grad">Curator</h1>
-      <p class="text-xs text-slate-500">给你的数字大脑雇一队 AI 图书管理员</p>
+      <h1 class="text-lg font-bold tracking-wide brand-grad">洞察织机</h1>
+      <p class="text-xs text-slate-500">把收藏变成可用知识</p>
     </div>
     <div class="ml-auto flex items-center gap-2 text-xs">
-      <div class="flex bg-slate-800/60 rounded-full p-0.5">
-        <button id="tab-workbench" onclick="switchTab('workbench')" class="px-3 py-1 rounded-full bg-sky-600 text-white font-medium transition">🛠 工作台</button>
-        <button id="tab-digest" onclick="switchTab('digest')" class="px-3 py-1 rounded-full text-slate-400 hover:text-slate-200 transition">🌻 简报</button>
+      <div class="flex bg-white/85 border border-slate-300 rounded-full p-0.5 shadow-inner shadow-slate-200">
+        <button id="tab-workbench" onclick="switchTab('workbench')" class="px-3 py-1 rounded-full bg-sky-600 text-white font-medium transition duration-200 shadow-sm shadow-sky-400/40">🛠 工作台</button>
+        <button id="tab-digest" onclick="switchTab('digest')" class="px-3 py-1 rounded-full text-slate-500 hover:text-slate-700 transition duration-200">🌻 今日简报</button>
       </div>
-      <span id="llm-badge" class="px-2.5 py-1 rounded-full bg-slate-800 text-slate-400">…</span>
+      <button id="theme-toggle" class="theme-toggle" type="button" title="点击切换: 浅色 / 深色 / 跟随系统">🌙 深色</button>
+      <span id="llm-badge" class="px-2.5 py-1 rounded-full bg-slate-100 text-slate-500 border border-slate-200">…</span>
     </div>
   </div>
 
@@ -55,72 +344,124 @@
   </div>
 </header>
 
-<div id="view-workbench">
+<div id="view-workbench" class="relative z-10">
+<section class="max-w-7xl mx-auto px-4 pt-6 pb-2">
+  <div class="hero-panel rounded-2xl p-6 md:p-7 panel-hover">
+    <p class="text-xs text-slate-500 mb-2">先治理，再入库；先可信，再可用</p>
+    <h2 class="text-2xl md:text-3xl font-bold tracking-tight text-slate-900">洞察织机：把收藏变成可用知识</h2>
+    <p class="text-sm text-slate-600 mt-3 max-w-3xl leading-relaxed">把文章、论文、链接和笔记丢进收件箱，洞察织机自动分拣、摘要、互链与审查；你一键审批，沉淀为长期可复用的知识资产。</p>
+    <div class="flex flex-wrap gap-2 mt-4">
+      <button onclick="document.getElementById('f-title')?.scrollIntoView({behavior:'smooth', block:'center'});document.getElementById('f-title')?.focus();"
+              class="btn-primary">立即开始整理</button>
+      <button onclick="switchTab('digest')"
+              class="btn-secondary">查看今日简报</button>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5 text-xs">
+      <div class="feature-tile">👀 看得见的治理流水线：分类、摘要、互链、审查全流程可视。</div>
+      <div class="feature-tile">✅ 人审批才落盘：AI 只提交提案，未经确认不改知识库。</div>
+      <div class="feature-tile">📄 零锁定资产：Markdown 直存，随时可迁移可备份。</div>
+    </div>
+  </div>
+</section>
 <main class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-5">
 
   <!-- Panel 1: Inbox -->
   <section class="space-y-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
+    <div class="glass-panel panel-hover rounded-2xl p-4">
       <h2 class="font-semibold mb-3 flex items-center gap-2">📥 收件箱</h2>
       <form id="inbox-form" class="space-y-2">
         <input id="f-title" required maxlength="200" placeholder="标题,如:LangGraph 状态管理详解"
-               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/40 transition">
+               class="input-field">
         <input id="f-url" placeholder="来源 URL(可选)"
-               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/40 transition">
+               class="input-field">
         <textarea id="f-content" rows="4" placeholder="粘贴内容……(长内容将触发深加工:摘要 + 互链 + 对抗审查)"
-               class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm placeholder:text-slate-600 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500/40 transition"></textarea>
-        <button class="w-full bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white rounded-lg py-2 text-sm font-medium transition shadow-lg shadow-sky-950/60">
-          投递 → Agent 流水线
+               class="input-field"></textarea>
+        <p class="text-[11px] text-slate-500 px-0.5">已支持自动保存草稿；在正文中可用 <kbd class="px-1.5 py-0.5 rounded border border-slate-300 bg-white/80">⌘/Ctrl + Enter</kbd> 快速投递</p>
+        <button id="inbox-submit" class="w-full btn-primary" type="submit">
+          投递到洞察织机
         </button>
       </form>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
-      <h2 class="font-semibold mb-3">🗂️ 队列 <span id="item-count" class="text-xs text-slate-500 font-normal"></span></h2>
+    <div class="glass-panel panel-hover rounded-2xl p-4">
+      <h2 class="font-semibold mb-3">🗂️ 待治理队列 <span id="item-count" class="text-xs text-slate-500 font-normal"></span></h2>
       <div id="items" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
     </div>
   </section>
 
   <!-- Panel 2: Agent Activity -->
-  <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
+  <section class="glass-panel panel-hover rounded-2xl p-4">
     <h2 class="font-semibold mb-1 flex items-center gap-2">
-      🤖 Agent 工作台
-      <span id="live-dot" class="ml-auto text-[10px] text-emerald-400 bg-emerald-950/80 border border-emerald-900/60 px-2 py-0.5 rounded-full">● LIVE</span>
+      🤖 洞察织机工作台
+      <span id="live-dot" class="ml-auto text-[10px] text-emerald-700 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">● LIVE</span>
     </h2>
     <div class="flex flex-wrap gap-1.5 mb-3" id="agent-legend"></div>
     <div id="events" class="relative space-y-2 max-h-[520px] overflow-y-auto pr-1"></div>
   </section>
 
   <!-- Panel 3: Approvals -->
-  <section class="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg shadow-slate-950/50">
-    <h2 class="font-semibold mb-3">🕘 审批台 <span id="approval-count" class="text-xs text-amber-500 font-normal"></span></h2>
+  <section class="glass-panel panel-hover rounded-2xl p-4">
+      <h2 class="font-semibold mb-3">🕘 馆长审批台 <span id="approval-count" class="text-xs text-amber-500 font-normal"></span></h2>
     <div id="proposals" class="space-y-3 max-h-[520px] overflow-y-auto pr-1"></div>
   </section>
 </main>
 
 <!-- Vault footer -->
 <footer class="max-w-7xl mx-auto px-4 pb-8">
-  <div class="bg-slate-900/60 border border-slate-800 rounded-2xl p-4">
-    <h2 class="font-semibold mb-2 text-sm">📚 Vault <span class="text-slate-500 font-normal text-xs">— 磁盘上的 Markdown,Obsidian 可直接打开</span></h2>
+  <div class="glass-panel panel-hover rounded-2xl p-4">
+    <h2 class="font-semibold mb-2 text-sm">📚 知库 <span class="text-slate-500 font-normal text-xs">— 磁盘上的 Markdown,Obsidian 可直接打开</span></h2>
     <div id="vault" class="flex flex-wrap gap-2"></div>
   </div>
 </footer>
+
+<section class="max-w-7xl mx-auto px-4 pb-8 space-y-5">
+  <div class="glass-panel panel-hover rounded-2xl p-4">
+    <h2 class="font-semibold mb-3">⚙️ 如何工作</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-xs text-slate-400">
+      <div class="feature-tile">1) 投递内容到洞察织机收件箱</div>
+      <div class="feature-tile">2) 自动治理：分类 → 摘要/互链 → 对抗审查</div>
+      <div class="feature-tile">3) 馆长审批：批准入库或退回重审</div>
+      <div class="feature-tile">4) 纳入知库并持续巡库优化</div>
+    </div>
+  </div>
+
+  <div class="glass-panel panel-hover rounded-2xl p-4">
+    <h2 class="font-semibold mb-3">❓ FAQ</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+      <div class="feature-tile"><span class="text-slate-800">和普通 AI 笔记工具有什么区别？</span><br>洞察织机强调“治理 + 审批”，重点是可控、可信、可追溯。</div>
+      <div class="feature-tile"><span class="text-slate-800">数据会被锁在平台里吗？</span><br>不会。知识本体是本地 Markdown 文件，随时可迁移。</div>
+      <div class="feature-tile"><span class="text-slate-800">可以不用云模型吗？</span><br>可以。支持兼容接口，也可接入本地模型方案。</div>
+      <div class="feature-tile"><span class="text-slate-800">每天要花多久维护？</span><br>通常 2 分钟完成审批，1 分钟查看简报即可。</div>
+    </div>
+  </div>
+
+  <div class="glass-panel panel-hover rounded-2xl p-5 flex flex-col md:flex-row items-start md:items-center gap-3">
+    <div>
+      <h2 class="font-semibold">从今天开始，让知识自动变资产</h2>
+      <p class="text-xs text-slate-600 mt-1">停止“只收藏不沉淀”，把每一次输入转化为可复用的长期价值。</p>
+      <p class="text-[11px] text-slate-500 mt-1.5">官网地址：<a href="https://insightloomapp.com" target="_blank" rel="noopener noreferrer" class="underline decoration-slate-400 hover:decoration-sky-500">insightloomapp.com</a></p>
+    </div>
+    <button onclick="document.getElementById('f-title')?.scrollIntoView({behavior:'smooth', block:'center'});document.getElementById('f-title')?.focus();"
+            class="md:ml-auto btn-primary">免费开始使用洞察织机</button>
+  </div>
+
+</section>
 </div><!-- /view-workbench -->
 
 <!-- ============ 简报视图 ============ -->
-<div id="view-digest" class="hidden max-w-7xl mx-auto px-4 py-6 space-y-5">
+<div id="view-digest" class="hidden relative z-10 max-w-7xl mx-auto px-4 py-6 space-y-5">
   <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="digest-cards"></div>
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+    <div class="glass-panel panel-hover rounded-2xl p-4">
       <h2 class="font-semibold mb-3 flex items-center gap-2">🌻 园丁巡库
-        <button onclick="runGardener()" class="ml-auto text-xs bg-emerald-700 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg transition">运行巡库</button>
+        <button onclick="runGardener()" class="ml-auto text-xs bg-emerald-700/90 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg border border-emerald-500/30 transition">开始巡库</button>
       </h2>
       <div id="digest-findings" class="space-y-2"></div>
     </div>
-    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4">
+    <div class="glass-panel panel-hover rounded-2xl p-4">
       <h2 class="font-semibold mb-3">🏷️ 高频标签</h2>
       <div id="digest-tags" class="flex flex-wrap gap-2"></div>
-      <p class="text-xs text-slate-600 mt-4 leading-relaxed">巡库发现的问题会列在左侧;双链建议会出现在工作台的审批队列中,批准后自动追加到既有笔记。</p>
+      <p class="text-xs text-slate-600 mt-4 leading-relaxed">巡库发现会列在左侧;双链建议会进入馆长审批台,批准后自动追加到既有笔记。</p>
     </div>
   </div>
 </div>
@@ -128,6 +469,157 @@
 <script>
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const TAB_BASE = 'px-3 py-1 rounded-full font-medium transition duration-200';
+const THEME_KEY = 'insightloom_theme';
+const LEGACY_THEME_KEY = 'zhice_theme';
+const DRAFT_KEY = 'insightloom_inbox_draft';
+const THEME_ORDER = ['light', 'dark', 'auto'];
+const THEME_COPY = {
+  light: '☀️ 浅色',
+  dark: '🌙 深色',
+  auto: '🖥 跟随系统',
+};
+let currentThemeMode = 'light';
+let themeMediaQuery = null;
+const COPY = {
+  submitReady: '投递到洞察织机',
+  submitSending: '投递中…',
+  proposalApprove: '✅ 批准入库',
+  proposalReject: '🚫 退回重审',
+  proposalPendingSuffix: '条待审批',
+  toastRejected: '🚫 已退回重审',
+  toastIngested: file => `✅ 已纳入知库 vault/${file}`,
+  toastLinkUpdated: file => `🌻 双链已追加到 ${file}`,
+  toastInboxQueued: '📥 已投递到洞察织机,治理流水线启动',
+  toastInboxFailed: '投递失败,请稍后重试',
+  toastDraftRestored: '已恢复上次未提交草稿',
+};
+
+function readThemePreference() {
+  try {
+    const saved = localStorage.getItem(THEME_KEY);
+    if (saved === 'dark' || saved === 'light' || saved === 'auto') return saved;
+    const legacy = localStorage.getItem(LEGACY_THEME_KEY);
+    if (legacy === 'dark' || legacy === 'light' || legacy === 'auto') return legacy;
+  } catch (_) {}
+  return 'light';
+}
+
+function getSystemTheme() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light';
+  if (!themeMediaQuery) themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  return themeMediaQuery.matches ? 'dark' : 'light';
+}
+
+function resolveThemeMode(mode) {
+  return mode === 'auto' ? getSystemTheme() : mode;
+}
+
+function applyTheme(mode) {
+  currentThemeMode = mode;
+  const effectiveTheme = resolveThemeMode(mode);
+  const isDark = effectiveTheme === 'dark';
+  document.body.classList.toggle('dark-theme', isDark);
+  const btn = $('theme-toggle');
+  if (btn) {
+    btn.textContent = THEME_COPY[mode] || THEME_COPY.light;
+    btn.setAttribute('aria-label', `当前主题模式: ${btn.textContent}`);
+  }
+}
+
+function setTheme(theme, persist = true) {
+  applyTheme(theme);
+  if (!persist) return;
+  try {
+    localStorage.setItem(THEME_KEY, theme);
+  } catch (_) {}
+}
+
+function toggleTheme() {
+  const currentIdx = THEME_ORDER.indexOf(currentThemeMode);
+  const next = THEME_ORDER[(currentIdx + 1) % THEME_ORDER.length];
+  setTheme(next, true);
+}
+
+function bindSystemThemeListener() {
+  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return;
+  if (!themeMediaQuery) themeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+  const onChange = () => {
+    if (currentThemeMode === 'auto') applyTheme('auto');
+  };
+  if (typeof themeMediaQuery.addEventListener === 'function') {
+    themeMediaQuery.addEventListener('change', onChange);
+  } else if (typeof themeMediaQuery.addListener === 'function') {
+    themeMediaQuery.addListener(onChange);
+  }
+}
+
+function setInboxSubmitting(isSubmitting) {
+  const submitBtn = $('inbox-submit');
+  if (!submitBtn) return;
+  submitBtn.disabled = isSubmitting;
+  submitBtn.textContent = isSubmitting ? COPY.submitSending : COPY.submitReady;
+  submitBtn.classList.toggle('opacity-70', isSubmitting);
+  submitBtn.classList.toggle('cursor-not-allowed', isSubmitting);
+}
+
+function readInboxDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const draft = JSON.parse(raw);
+    if (!draft || typeof draft !== 'object') return null;
+    return {
+      title: String(draft.title || ''),
+      url: String(draft.url || ''),
+      content: String(draft.content || ''),
+    };
+  } catch (_) {
+    return null;
+  }
+}
+
+function saveInboxDraft() {
+  try {
+    localStorage.setItem(DRAFT_KEY, JSON.stringify({
+      title: $('f-title')?.value || '',
+      url: $('f-url')?.value || '',
+      content: $('f-content')?.value || '',
+    }));
+  } catch (_) {}
+}
+
+function clearInboxDraft() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+  } catch (_) {}
+}
+
+function bindInboxEnhancements() {
+  const draft = readInboxDraft();
+  if (draft && (draft.title || draft.url || draft.content)) {
+    $('f-title').value = draft.title;
+    $('f-url').value = draft.url;
+    $('f-content').value = draft.content;
+    toast(COPY.toastDraftRestored);
+  }
+
+  ['f-title', 'f-url', 'f-content'].forEach(id => {
+    const el = $(id);
+    if (el) el.addEventListener('input', saveInboxDraft);
+  });
+
+  const contentInput = $('f-content');
+  const form = $('inbox-form');
+  if (contentInput && form) {
+    contentInput.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        form.requestSubmit();
+      }
+    });
+  }
+}
 
 /* ---------- Agent 名录(配色统一来源) ---------- */
 const AGENTS = {
@@ -139,49 +631,58 @@ const AGENTS = {
   '园丁':   { emoji:'🌻', color:'lime' },
 };
 const AGENT_COLORS = {
-  sky:   { dot:'bg-sky-400',    text:'text-sky-300',    chip:'bg-sky-950/70 text-sky-300 border-sky-900/60' },
-  violet:{ dot:'bg-violet-400', text:'text-violet-300', chip:'bg-violet-950/70 text-violet-300 border-violet-900/60' },
-  amber: { dot:'bg-amber-400',  text:'text-amber-300',  chip:'bg-amber-950/70 text-amber-300 border-amber-900/60' },
-  rose:  { dot:'bg-rose-400',   text:'text-rose-300',   chip:'bg-rose-950/70 text-rose-300 border-rose-900/60' },
-  emerald:{dot:'bg-emerald-400',text:'text-emerald-300',chip:'bg-emerald-950/70 text-emerald-300 border-emerald-900/60' },
-  lime:  { dot:'bg-lime-400',   text:'text-lime-300',   chip:'bg-lime-950/70 text-lime-300 border-lime-900/60' },
+  sky:   { dot:'bg-sky-500',    text:'text-sky-700',    chip:'bg-sky-50 text-sky-700 border-sky-200' },
+  violet:{ dot:'bg-violet-500', text:'text-violet-700', chip:'bg-violet-50 text-violet-700 border-violet-200' },
+  amber: { dot:'bg-amber-500',  text:'text-amber-700',  chip:'bg-amber-50 text-amber-700 border-amber-200' },
+  rose:  { dot:'bg-rose-500',   text:'text-rose-700',   chip:'bg-rose-50 text-rose-700 border-rose-200' },
+  emerald:{dot:'bg-emerald-500',text:'text-emerald-700',chip:'bg-emerald-50 text-emerald-700 border-emerald-200' },
+  lime:  { dot:'bg-lime-500',   text:'text-lime-700',   chip:'bg-lime-50 text-lime-700 border-lime-200' },
 };
 function agentStyle(name) {
   for (const [key, cfg] of Object.entries(AGENTS)) if (name.includes(key)) return cfg;
   return { emoji:'⚡', color:'slate' };
 }
-const SLATE = { dot:'bg-slate-500', text:'text-slate-400', chip:'bg-slate-800/70 text-slate-300 border-slate-700' };
+const SLATE = { dot:'bg-slate-400', text:'text-slate-600', chip:'bg-slate-100 text-slate-600 border-slate-300' };
 
 const ITEM_STATUS = {
-  pending:          ['排队中','bg-slate-800 text-slate-400'],
-  processing:       ['Agent 处理中','bg-sky-950 text-sky-400'],
-  awaiting_approval:['待审批','bg-amber-950 text-amber-400'],
-  done:             ['已入库','bg-emerald-950 text-emerald-400'],
-  rejected:         ['已拒绝','bg-rose-950 text-rose-400'],
-  error:            ['出错','bg-rose-950 text-rose-400'],
+  pending:          ['等待治理','bg-slate-100 text-slate-600'],
+  processing:       ['洞察织机治理中','bg-sky-100 text-sky-700'],
+  awaiting_approval:['等待馆长审批','bg-amber-100 text-amber-700'],
+  done:             ['已纳入知库','bg-emerald-100 text-emerald-700'],
+  rejected:         ['未通过本次入库','bg-rose-100 text-rose-700'],
+  error:            ['治理出错','bg-rose-100 text-rose-700'],
 };
-const LEVEL_BORDER = { info:'', warn:'border-l-amber-500/70', debate:'border-l-violet-500/70' };
+const LEVEL_BORDER = { info:'border-l-slate-300', warn:'border-l-amber-400', debate:'border-l-violet-400' };
+const VERDICT_THEME = {
+  pass: ['✅ 审查通过', 'text-emerald-600'],
+  questioned: ['⚔️ 质疑员存疑', 'text-violet-600'],
+  default: ['🌻 园丁建议', 'text-lime-600'],
+};
+const PROPOSAL_STATUS_THEME = {
+  approved: ['已纳入知库', 'text-emerald-600'],
+  rejected: ['未通过本次入库', 'text-rose-600'],
+};
 
 /* ---------- Markdown-lite 渲染(提案预览用) ---------- */
 function mdLite(src) {
   let h = esc(src);
   h = h.replace(/\[\[([^\]]+)\]\]/g, '<span class="wikilink">[[$1]]</span>');
-  h = h.replace(/^### (.*)$/gm, '<div class="font-semibold text-slate-300 mt-2">$1</div>');
-  h = h.replace(/^## (.*)$/gm, '<div class="font-bold text-sky-300 mt-2">$1</div>');
-  h = h.replace(/^# (.*)$/gm, '<div class="font-bold text-base text-slate-100 mt-1">$1</div>');
-  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-slate-200">$1</strong>');
-  h = h.replace(/`([^`]+)`/g, '<code class="bg-slate-800 text-amber-200 rounded px-1 text-[11px]">$1</code>');
-  h = h.replace(/^- (.*)$/gm, '<div class="pl-3 border-l border-slate-700/60 ml-1 my-0.5">$1</div>');
-  h = h.replace(/^&gt; (.*)$/gm, '<div class="pl-2 border-l-2 border-slate-600 text-slate-400 italic my-1">$1</div>');
-  h = h.replace(/^---+$/gm, '<hr class="border-slate-800 my-2">');
+  h = h.replace(/^### (.*)$/gm, '<div class="font-semibold text-slate-700 mt-2">$1</div>');
+  h = h.replace(/^## (.*)$/gm, '<div class="font-bold text-sky-700 mt-2">$1</div>');
+  h = h.replace(/^# (.*)$/gm, '<div class="font-bold text-base text-slate-800 mt-1">$1</div>');
+  h = h.replace(/\*\*([^*]+)\*\*/g, '<strong class="text-slate-800">$1</strong>');
+  h = h.replace(/`([^`]+)`/g, '<code class="bg-slate-100 text-amber-700 rounded px-1 text-[11px] border border-slate-200">$1</code>');
+  h = h.replace(/^- (.*)$/gm, '<div class="pl-3 border-l border-slate-300 ml-1 my-0.5">$1</div>');
+  h = h.replace(/^&gt; (.*)$/gm, '<div class="pl-2 border-l-2 border-slate-300 text-slate-600 italic my-1">$1</div>');
+  h = h.replace(/^---+$/gm, '<hr class="border-slate-200 my-2">');
   return h.replace(/\n/g, '<br>');
 }
 
 /* ---------- Toast ---------- */
 function toast(msg, type='ok') {
   const style = type === 'ok'
-    ? 'bg-emerald-950/90 border-emerald-800 text-emerald-200'
-    : 'bg-rose-950/90 border-rose-800 text-rose-200';
+    ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
+    : 'bg-rose-50 border-rose-300 text-rose-700';
   const el = document.createElement('div');
   el.className = `toast border rounded-xl px-4 py-2.5 text-sm shadow-xl backdrop-blur ${style}`;
   el.textContent = msg;
@@ -205,16 +706,16 @@ function renderStagebar(s) {
   }
   const anyPendingApproval = s.proposals.some(p => p.status === 'pending');
   $('stagebar').innerHTML =
-    `<span class="text-[10px] text-slate-500 mr-2 whitespace-nowrap">${processing ? '⚡ 正在处理「' + esc(processing.title) + '」' : '流水线待命'}</span>` +
+    `<span class="text-[10px] text-slate-600 mr-2 whitespace-nowrap rounded-full border border-slate-300 bg-white/80 px-2 py-1">${processing ? '⚡ 洞察织机治理中「' + esc(processing.title) + '」' : '洞察织机流水线待命'}</span>` +
     STAGES.map((st, i) => {
       const active = processing && fired.has(st.key);
       const isApproval = st.key === '审批';
       const lit = active || (isApproval && !processing && anyPendingApproval);
-      const cfg = AGENTS[st.key] ? AGENT_COLORS[AGENTS[st.key].color] : {text:'text-amber-300'};
+      const cfg = AGENTS[st.key] ? AGENT_COLORS[AGENTS[st.key].color] : {text:'text-amber-700'};
       const emoji = AGENTS[st.key] ? AGENTS[st.key].emoji : '✋';
       return `<div class="flex items-center gap-1 whitespace-nowrap">
-        <div class="px-2.5 py-1 rounded-full border text-[11px] border-slate-700/70 text-slate-500 ${lit ? 'stage-active border-sky-600/60 bg-sky-950/60 text-sky-300 stage-glow' : ''}">${emoji} ${st.label}</div>
-        ${i < STAGES.length - 1 ? '<div class="w-4 h-px bg-slate-700/70"></div>' : ''}
+        <div class="px-2.5 py-1 rounded-full border text-[11px] border-slate-300 text-slate-600 bg-white/80 ${lit ? 'stage-active border-sky-400 bg-sky-100 text-sky-700 stage-glow' : ''}">${emoji} ${st.label}</div>
+        ${i < STAGES.length - 1 ? '<div class="w-4 h-px bg-slate-300"></div>' : ''}
       </div>`;
     }).join('');
 }
@@ -222,67 +723,69 @@ function renderStagebar(s) {
 /* ---------- 主渲染 ---------- */
 function render(s) {
   $('llm-badge').textContent = s.llm.mock ? 'LLM: MOCK 模式' : `LLM: ${s.llm.model}`;
-  $('llm-badge').className = 'px-2.5 py-1 rounded-full ' + (s.llm.mock ? 'bg-amber-950 text-amber-400' : 'bg-emerald-950 text-emerald-400');
+  $('llm-badge').className = 'px-2.5 py-1 rounded-full border ' + (s.llm.mock ? 'bg-amber-50 text-amber-700 border-amber-300' : 'bg-emerald-50 text-emerald-700 border-emerald-300');
   renderStagebar(s);
 
   // Agent 图例
   $('agent-legend').innerHTML = Object.entries(AGENTS).map(([name, cfg]) => {
     const c = AGENT_COLORS[cfg.color];
-    return `<span class="text-[10px] px-2 py-0.5 rounded-full border ${c.chip}">${cfg.emoji} ${name}</span>`;
+    return `<span class="text-[10px] px-2 py-0.5 rounded-full border ${c.chip} shadow-sm shadow-slate-950/40">${cfg.emoji} ${name}</span>`;
   }).join('');
 
   // 队列
   $('item-count').textContent = `(${s.items.length})`;
   $('items').innerHTML = s.items.map(i => {
-    const [label, cls] = ITEM_STATUS[i.status] || [i.status,'bg-slate-800'];
-    return `<div class="flex items-center gap-2 text-sm bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 fade-in hover:border-slate-600 transition">
+    const [label, cls] = ITEM_STATUS[i.status] || [i.status,'bg-slate-100 text-slate-600'];
+    return `<div class="flex items-center gap-2 text-sm bg-white/88 border border-slate-200 rounded-xl px-3 py-2.5 fade-in hover:border-slate-300 hover:bg-white transition">
       <span class="truncate flex-1">${esc(i.title)}</span>
       <span class="text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap ${cls}">${label}</span></div>`;
-  }).join('') || `<div class="text-xs text-slate-600 border border-dashed border-slate-800 rounded-lg px-3 py-6 text-center">📭 还没有内容<br>把想收藏的文章粘贴到左边开始</div>`;
+  }).join('') || `<div class="text-xs text-slate-500 border border-dashed border-slate-300 rounded-lg px-3 py-6 text-center">📭 还没有待治理内容<br>把想收藏的文章粘贴到左边开始</div>`;
 
   // 事件流:Agent 配色头像 + 时间线
   $('events').innerHTML = s.events.map(e => {
     const cfg = agentStyle(e.agent);
     const c = AGENT_COLORS[cfg.color] || SLATE;
     const time = new Date(e.created_at * 1000).toLocaleTimeString('zh-CN',{hour12:false});
-    return `<div class="flex gap-2.5 fade-in">
+    const level = LEVEL_BORDER[e.level] || LEVEL_BORDER.info;
+    return `<div class="flex gap-2.5 fade-in rounded-xl border border-slate-200 bg-white/90 px-2 py-2 ${level} border-l-2 hover:border-slate-300 transition">
       <div class="flex flex-col items-center pt-0.5">
-        <div class="w-7 h-7 rounded-full grid place-items-center text-sm bg-slate-950 border border-slate-700 ${c.text}">${cfg.emoji}</div>
-        <div class="w-px flex-1 bg-slate-800 mt-1"></div>
+        <div class="w-7 h-7 rounded-full grid place-items-center text-sm bg-slate-50 border border-slate-300 ${c.text}">${cfg.emoji}</div>
+        <div class="w-px flex-1 bg-slate-300 mt-1"></div>
       </div>
       <div class="flex-1 pb-2 min-w-0">
         <div class="flex justify-between items-baseline gap-2">
           <span class="text-xs font-medium ${c.text}">${esc(e.agent.replace(cfg.emoji,'').trim())}</span>
           <span class="text-[10px] text-slate-600">${time}</span>
         </div>
-        <div class="text-xs text-slate-400 leading-relaxed break-words">「<span class="text-slate-300">${esc(e.item_title || '')}</span>」${esc(e.message)}</div>
+        <div class="text-xs text-slate-500 leading-relaxed break-words">「<span class="text-slate-700">${esc(e.item_title || '')}</span>」${esc(e.message)}</div>
       </div></div>`;
-  }).join('') || `<div class="text-xs text-slate-600 border border-dashed border-slate-800 rounded-lg px-3 py-6 text-center">🤖 Agent 们待命中…<br>投递内容后可以看到流水线实况</div>`;
+  }).join('') || `<div class="text-xs text-slate-500 border border-dashed border-slate-300 rounded-lg px-3 py-6 text-center">🤖 洞察织机馆员待命中…<br>投递内容后可以看到治理实况</div>`;
 
   // 审批台
   const pending = s.proposals.filter(p => p.status==='pending');
-  $('approval-count').textContent = pending.length ? `${pending.length} 条待处理` : '';
+  $('approval-count').textContent = pending.length ? `${pending.length} ${COPY.proposalPendingSuffix}` : '';
   $('proposals').innerHTML = s.proposals.map(p => {
     if (p.status==='pending') {
-      return `<div class="border border-amber-900/50 bg-slate-950 rounded-xl p-3 fade-in hover:border-amber-700/60 transition">
+      const verdict = VERDICT_THEME[p.verdict] || VERDICT_THEME.default;
+      return `<div class="border border-amber-300 bg-amber-50/55 rounded-xl p-3 fade-in hover:border-amber-400 transition shadow-sm shadow-amber-100/70">
         <div class="flex justify-between items-center mb-2 text-xs">
-          <span class="text-amber-400 font-mono">#${p.id} → vault/${esc(p.filepath)}</span>
-          <span class="${p.verdict==='pass'?'text-emerald-400':p.verdict==='questioned'?'text-violet-400':'text-lime-400'}">${p.verdict==='pass'?'✅ 审查通过':p.verdict==='questioned'?'⚔️ 质疑员存疑':'🌻 园丁建议'}</span>
+          <span class="text-amber-700 font-mono">#${p.id} → vault/${esc(p.filepath)}</span>
+          <span class="${verdict[1]}">${verdict[0]}</span>
         </div>
-        <div class="text-[11px] leading-relaxed text-slate-400 max-h-48 overflow-y-auto bg-slate-900/70 rounded-lg p-2.5 border border-slate-800">${p.kind==='link_suggestion' ? mdLite(p.markdown) : mdLite(p.markdown)}</div>
+        <div class="text-[11px] leading-relaxed text-slate-600 max-h-48 overflow-y-auto bg-white/90 rounded-lg p-2.5 border border-slate-200">${p.kind==='link_suggestion' ? mdLite(p.markdown) : mdLite(p.markdown)}</div>
         <div class="flex gap-2 mt-2.5">
-          <button onclick="act(${p.id},'approve')" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg py-1.5 text-xs font-medium transition">✅ 批准入库</button>
-          <button onclick="act(${p.id},'reject')" class="flex-1 bg-slate-800 hover:bg-rose-900 text-slate-300 rounded-lg py-1.5 text-xs transition">🚫 拒绝</button>
+          <button onclick="act(${p.id},'approve')" class="flex-1 bg-emerald-700 hover:bg-emerald-600 border border-emerald-500/30 text-white rounded-lg py-1.5 text-xs font-medium transition shadow-sm shadow-emerald-950/40">${COPY.proposalApprove}</button>
+          <button onclick="act(${p.id},'reject')" class="flex-1 bg-white hover:bg-rose-50 border border-slate-300 hover:border-rose-300 text-slate-700 rounded-lg py-1.5 text-xs transition">${COPY.proposalReject}</button>
         </div></div>`;
     }
-    const [label, cls] = p.status==='approved' ? ['已入库','text-emerald-400'] : ['已拒绝','text-rose-400'];
-    return `<div class="border border-slate-800 bg-slate-950/50 rounded-lg px-3 py-2 text-xs flex justify-between fade-in opacity-70">
+    const [label, cls] = PROPOSAL_STATUS_THEME[p.status] || PROPOSAL_STATUS_THEME.rejected;
+    return `<div class="border border-slate-200 bg-white/70 rounded-lg px-3 py-2 text-xs flex justify-between fade-in opacity-80">
       <span class="font-mono text-slate-500">#${p.id} ${esc(p.filepath)}</span><span class="${cls}">${label}</span></div>`;
-  }).join('') || `<div class="text-xs text-slate-600 border border-dashed border-slate-800 rounded-lg px-3 py-6 text-center">🕘 暂无待审批提案<br>Agent 的每笔修改都会先到这里等你确认</div>`;
+  }).join('') || `<div class="text-xs text-slate-500 border border-dashed border-slate-300 rounded-lg px-3 py-6 text-center">🕘 暂无待审批提案<br>洞察织机的每笔修改都会先到这里等你确认</div>`;
 
   // vault
   $('vault').innerHTML = s.vault.map(f =>
-    `<span class="text-xs bg-slate-950 border border-slate-800 hover:border-sky-800 rounded-full px-3 py-1 font-mono transition">📄 ${esc(f)}</span>`
+    `<span class="text-xs bg-white/90 border border-slate-200 hover:border-sky-300 rounded-full px-3 py-1 font-mono transition">📄 ${esc(f)}</span>`
   ).join('') || '<span class="text-xs text-slate-600">空</span>';
 }
 
@@ -298,8 +801,8 @@ async function act(pid, action){
   try {
     const r = await fetch(`/api/proposals/${pid}/${action}`, {method:'POST'});
     const d = await r.json();
-    if (action === 'approve') toast(d.kind === 'link_suggestion' ? `🌻 双链已追加到 ${d.file}` : `✅ 已入库 vault/${d.file}`);
-    else toast('🚫 已拒绝该提案', 'warn');
+    if (action === 'approve') toast(d.kind === 'link_suggestion' ? COPY.toastLinkUpdated(d.file) : COPY.toastIngested(d.file));
+    else toast(COPY.toastRejected, 'warn');
   } catch(e) { toast('操作失败,请重试', 'warn'); }
   poll();
 }
@@ -308,8 +811,8 @@ async function act(pid, action){
 function switchTab(tab){
   $('view-workbench').classList.toggle('hidden', tab !== 'workbench');
   $('view-digest').classList.toggle('hidden', tab !== 'digest');
-  $('tab-workbench').className = 'px-3 py-1 rounded-full font-medium transition ' + (tab==='workbench' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200');
-  $('tab-digest').className = 'px-3 py-1 rounded-full font-medium transition ' + (tab==='digest' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200');
+  $('tab-workbench').className = TAB_BASE + (tab==='workbench' ? ' bg-sky-600 text-white shadow-sm shadow-sky-400/40' : ' text-slate-500 hover:text-slate-700 hover:bg-slate-100');
+  $('tab-digest').className = TAB_BASE + (tab==='digest' ? ' bg-sky-600 text-white shadow-sm shadow-sky-400/40' : ' text-slate-500 hover:text-slate-700 hover:bg-slate-100');
   if (tab === 'digest') fetchDigest();
 }
 
@@ -317,31 +820,31 @@ async function fetchDigest(){
   try {
     const d = await (await fetch('/api/digest')).json();
     const cards = [
-      ['📥 24h 投递', d.stats_24h.items, 'text-sky-400'],
-      ['✅ 24h 入库', d.stats_24h.approved, 'text-emerald-400'],
-      ['🕘 待审批', d.stats_24h.pending, 'text-amber-400'],
-      ['📚 库存笔记', d.vault.total, 'text-violet-400'],
+      ['📥 24h 投递', d.stats_24h.items, 'text-sky-600'],
+      ['✅ 24h 纳入知库', d.stats_24h.approved, 'text-emerald-600'],
+      ['🕘 待审批', d.stats_24h.pending, 'text-amber-600'],
+      ['📚 库存笔记', d.vault.total, 'text-violet-600'],
     ];
     $('digest-cards').innerHTML = cards.map(([label, val, cls]) => `
-      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 hover:border-slate-600 transition">
+      <div class="glass-panel rounded-2xl p-4 hover:border-slate-600/80 transition panel-hover">
         <div class="text-2xl font-bold ${cls}">${val}</div>
         <div class="text-xs text-slate-500 mt-1">${label}</div></div>`).join('');
     const ISSUE = {
-      orphan: ['🏝️ 孤立','border-amber-900/60 text-amber-300'],
-      stale: ['⏳ 疑似过时','border-slate-700 text-slate-300'],
-      thin: ['🪶 薄弱','border-slate-700 text-slate-300'],
+      orphan: ['🏝️ 孤立','border-amber-300 text-amber-700'],
+      stale: ['⏳ 疑似过时','border-slate-300 text-slate-600'],
+      thin: ['🪶 薄弱','border-slate-300 text-slate-600'],
     };
     $('digest-findings').innerHTML = d.findings.length
       ? d.findings.map(f => {
-          const [label, cls] = ISSUE[f.type] || [f.type,'border-slate-700'];
-          return `<div class="text-xs border rounded-lg px-3 py-2 bg-slate-950 ${cls}">
+          const [label, cls] = ISSUE[f.type] || [f.type,'border-slate-300 text-slate-600'];
+          return `<div class="text-xs border rounded-lg px-3 py-2 bg-white/90 ${cls} hover:border-slate-400 transition">
             <span class="font-medium">${label}</span>
             <span class="font-mono text-slate-400">${esc(f.note)}</span>
             <div class="text-slate-500 mt-0.5">${esc(f.detail)}</div></div>`;
         }).join('')
-      : '<p class="text-xs text-emerald-400">🌻 巡库无异常,知识库健康</p>';
+      : '<p class="text-xs text-emerald-600">🌻 巡库无异常,知识库健康</p>';
     $('digest-tags').innerHTML = d.top_tags.length
-      ? d.top_tags.map(t => `<span class="text-xs bg-slate-950 border border-slate-800 rounded-full px-3 py-1">${esc(t.tag)} <span class="text-slate-500">×${t.count}</span></span>`).join('')
+      ? d.top_tags.map(t => `<span class="text-xs bg-white/90 border border-slate-200 rounded-full px-3 py-1 hover:border-sky-300 transition">${esc(t.tag)} <span class="text-slate-500">×${t.count}</span></span>`).join('')
       : '<p class="text-xs text-slate-600">暂无标签</p>';
   } catch(e) {}
 }
@@ -358,11 +861,30 @@ $('inbox-form').addEventListener('submit', async e => {
   e.preventDefault();
   const body = { title: $('f-title').value.trim(), url: $('f-url').value.trim(), content: $('f-content').value };
   if (!body.title) return;
-  await fetch('/api/inbox', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
-  toast('📥 已投递,Agent 流水线启动');
-  e.target.reset();
-  poll();
+  setInboxSubmitting(true);
+  try {
+    const r = await fetch('/api/inbox', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+    if (!r.ok) throw new Error(`submit_failed_${r.status}`);
+    toast(COPY.toastInboxQueued);
+    e.target.reset();
+    clearInboxDraft();
+    poll();
+  } catch (_) {
+    toast(COPY.toastInboxFailed, 'warn');
+  } finally {
+    setInboxSubmitting(false);
+  }
 });
+
+const themeToggleBtn = $('theme-toggle');
+if (themeToggleBtn) {
+  themeToggleBtn.addEventListener('click', toggleTheme);
+}
+
+applyTheme(readThemePreference());
+bindSystemThemeListener();
+bindInboxEnhancements();
+setInboxSubmitting(false);
 
 poll();
 setInterval(poll, 2000);

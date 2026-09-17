@@ -1,16 +1,18 @@
-# 🏛️ Curator
+# 🧭 洞察织机 InsightLoom
 
 [English](README_EN.md) | **简体中文**
 
-> 给你的数字大脑雇一队 AI 图书管理员。
+> 把收藏编织成可行动的洞察。
 
-**Curator** 是一个自托管的个人知识工作台:你把文章、论文、链接、笔记丢进收件箱,一队**看得见的 Agent** 分拣、摘要、互链、对抗审查,生成每日简报——**所有对知识库的修改都需要你审批后才落盘**。
+**洞察织机（InsightLoom）** 是一个自托管的个人知识工作台:你把文章、论文、链接、笔记丢进收件箱,一队**看得见的 Agent** 分拣、摘要、互链、对抗审查,生成每日简报——**所有对知识库的修改都需要你审批后才落盘**。
+
+> 品牌官网域名: `insightloomapp.com`（建设中）
 
 ![screenshot](docs/screenshot-p0.png)
 
-## 为什么是 Curator
+## 为什么是 洞察织机
 
-现有的"AI 第二大脑"(如 khoj)大多是**被动检索**:你问,它答。Curator 的差异在于**主动加工**:
+现有的"AI 第二大脑"(如 khoj)大多是**被动检索**:你问,它答。洞察织机的差异在于**主动加工**:
 
 - 🔍 **流水线可见**:打开 UI 就能看到分类员、摘要员、链接员、质疑员实时处理你的阅读队列
 - ⚔️ **对抗审查**:质疑员对摘要员的产出做红队检查,过度概括、无中生有会被标记
@@ -101,6 +103,17 @@ curator/
 - [ ] **P1b** 知识图谱视图(双链可视化)、React 前端重构
 - [ ] **P2** Docker 一键部署、采集端(bookmarklet → 浏览器插件 → Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
 - [ ] **P3** 本地模型适配(Ollama)、checkpointer 时间旅行、RSS/邮件采集、多用户
+
+## 发布检查清单
+
+- 最小发布清单见: **[`docs/LAUNCH_MIN_CHECKLIST.md`](docs/LAUNCH_MIN_CHECKLIST.md)**
+
+## 近期执行记录
+
+- 竞赛记录（/Residency）: **[`docs/COMPETITION__CUP_2026.md`](docs/COMPETITION__CUP_2026.md)**
+- 初始化调整清单: **[`docs/INIT_ADJUSTMENTS.md`](docs/INIT_ADJUSTMENTS.md)**
+- 参赛 BP 模板: **[`docs/BP_OUTLINE.md`](docs/BP_OUTLINE.md)**
+- 参赛定位与复用指南: **[`docs/COMPETITION_POSITIONING.md`](docs/COMPETITION_POSITIONING.md)**
 
 ## 设计决策记录(ADR 摘要)
 

@@ -1,4 +1,4 @@
-"""Curator LLM 封装:OpenAI 兼容协议(默认 DeepSeek)+ MOCK 模式。
+"""洞察织机(InsightLoom)LLM 封装:OpenAI 兼容协议(默认 DeepSeek)+ MOCK 模式。
 
 MOCK 模式(CURATOR_LLM_MOCK=1 或无 Key 时自动):返回结构合理的确定性结果,
 让整条流水线在无 Key 环境下也可开发、演示、测试。
