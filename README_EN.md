@@ -61,22 +61,22 @@ UV_CACHE_DIR=/tmp/uv-cache uv pip install --python .venv/bin/python \
     fastapi "uvicorn[standard]" langgraph langchain-core openai python-dotenv
 
 # Mock mode (no API key needed — experience the full pipeline)
-CURATOR_LLM_MOCK=1 .venv/bin/uvicorn server.app:app --port 8300
+INSIGHTLOOM_LLM_MOCK=1 .venv/bin/uvicorn server.app:app --port 8300
 # Open http://127.0.0.1:8300
 
 # Real mode (DeepSeek — a few dollars goes a long way)
-CURATOR_LLM_API_KEY=sk-xxx .venv/bin/uvicorn server.app:app --port 8300
+INSIGHTLOOM_LLM_API_KEY=sk-xxx .venv/bin/uvicorn server.app:app --port 8300
 # Or any OpenAI-compatible provider:
-CURATOR_LLM_API_KEY=sk-xxx CURATOR_LLM_BASE_URL=https://api.openai.com/v1 \
-CURATOR_LLM_MODEL=gpt-4o-mini .venv/bin/uvicorn server.app:app
+INSIGHTLOOM_LLM_API_KEY=sk-xxx INSIGHTLOOM_LLM_BASE_URL=https://api.openai.com/v1 \
+INSIGHTLOOM_LLM_MODEL=gpt-4o-mini .venv/bin/uvicorn server.app:app
 
 # Free real models (OpenAI-compatible, pick either):
 # Zhipu GLM-4-Flash — permanently free after signup
-CURATOR_LLM_API_KEY=your-key CURATOR_LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4 \
-CURATOR_LLM_MODEL=glm-4-flash .venv/bin/uvicorn server.app:app
+INSIGHTLOOM_LLM_API_KEY=your-key INSIGHTLOOM_LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4 \
+INSIGHTLOOM_LLM_MODEL=glm-4-flash .venv/bin/uvicorn server.app:app
 # Alibaba Bailian — 70M free tokens for new users (90 days)
-CURATOR_LLM_API_KEY=sk-xxx CURATOR_LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1 \
-CURATOR_LLM_MODEL=qwen-plus .venv/bin/uvicorn server.app:app
+INSIGHTLOOM_LLM_API_KEY=sk-xxx INSIGHTLOOM_LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1 \
+INSIGHTLOOM_LLM_MODEL=qwen-plus .venv/bin/uvicorn server.app:app
 ```
 
 ## Project Structure

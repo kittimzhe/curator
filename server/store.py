@@ -8,7 +8,6 @@
 from __future__ import annotations
 
 import json
-import os
 import re
 import sqlite3
 import threading
@@ -16,12 +15,21 @@ import time
 from pathlib import Path
 from typing import Any
 
-DATA_DIR = Path(os.environ.get("CURATOR_DATA_DIR", Path(__file__).resolve().parent.parent / "data"))
-VAULT_DIR = Path(os.environ.get("CURATOR_VAULT_DIR", Path(__file__).resolve().parent.parent / "vault"))
+from . import config
+
+DATA_DIR = Path(config.env("DATA_DIR", str(Path(__file__).resolve().parent.parent / "data")))
+VAULT_DIR = Path(config.env("VAULT_DIR", str(Path(__file__).resolve().parent.parent / "vault")))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 VAULT_DIR.mkdir(parents=True, exist_ok=True)
 
-DB_PATH = DATA_DIR / "curator.db"
+DB_PATH = DATA_DIR / "loom.db"
+
+# 品牌迁移:旧数据文件 curator.db(含 WAL 边车)自动改名为 loom.db,数据无损
+for _suffix in ("", "-wal", "-shm"):
+    _legacy = DATA_DIR / f"curator.db{_suffix}"
+    _target = DATA_DIR / f"loom.db{_suffix}"
+    if _legacy.exists() and not _target.exists():
+        _legacy.rename(_target)
 
 _lock = threading.Lock()
 _conn: sqlite3.Connection | None = None

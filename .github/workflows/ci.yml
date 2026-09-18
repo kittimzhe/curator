@@ -29,5 +29,5 @@ jobs:
 
       - name: 端到端冒烟测试(MOCK 模式)
         env:
-          CURATOR_LLM_MOCK: "1"
+          INSIGHTLOOM_LLM_MOCK: "1"
         run: python scripts/smoke_test.py

@@ -1,7 +1,7 @@
 """洞察织机(InsightLoom)LLM 封装:OpenAI 兼容协议(默认 DeepSeek)+ MOCK 模式。
 
-MOCK 模式(CURATOR_LLM_MOCK=1 或无 Key 时自动):返回结构合理的确定性结果,
-让整条流水线在无 Key 环境下也可开发、演示、测试。
+MOCK 模式(INSIGHTLOOM_LLM_MOCK=1,旧前缀 CURATOR_LLM_MOCK 仍兼容;无 Key 时自动):
+返回结构合理的确定性结果,让整条流水线在无 Key 环境下也可开发、演示、测试。
 """
 
 from __future__ import annotations
@@ -10,15 +10,17 @@ import json
 import os
 import re
 
-_BASE = os.environ.get("CURATOR_LLM_BASE_URL", "https://api.deepseek.com")
-_MODEL = os.environ.get("CURATOR_LLM_MODEL", "deepseek-chat")
-_KEY_ENV = "CURATOR_LLM_API_KEY"
+from . import config
+
+_BASE = config.env("LLM_BASE_URL", "https://api.deepseek.com")
+_MODEL = config.env("LLM_MODEL", "deepseek-chat")
+_KEY = config.env("LLM_API_KEY")
 
 
 def _mock_mode() -> bool:
-    if os.environ.get("CURATOR_LLM_MOCK") == "1":
+    if config.env_flag("LLM_MOCK"):
         return True
-    return not os.environ.get(_KEY_ENV)
+    return not _KEY
 
 
 def llm_status() -> dict:
@@ -35,7 +37,7 @@ def ask_llm(system: str, user: str, expect_json: bool = False) -> str:
 
     from openai import OpenAI
 
-    client = OpenAI(api_key=os.environ[_KEY_ENV], base_url=_BASE)
+    client = OpenAI(api_key=_KEY, base_url=_BASE)
     resp = client.chat.completions.create(
         model=_MODEL,
         messages=[
