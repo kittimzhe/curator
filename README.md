@@ -80,6 +80,21 @@ INSIGHTLOOM_LLM_API_KEY=sk-xxx INSIGHTLOOM_LLM_BASE_URL=https://dashscope.aliyun
 INSIGHTLOOM_LLM_MODEL=qwen-plus .venv/bin/uvicorn server.app:app
 ```
 
+## 采集:把网页一键织入流水线
+
+**方式一 · 书签脚本(零安装)**:打开工作台,把「🌾 织入织机」按钮拖到浏览器书签栏;在任意网页点击,选中文字(或页面描述)+ 标题 + 链接直接进收件箱。
+
+**方式二 · 浏览器插件(右键直达,推荐)**:
+
+```
+1. Chrome 打开 chrome://extensions → 右上角开「开发者模式」
+2. 「加载已解压的扩展程序」→ 选择仓库里的 web_extension/ 目录
+3. 点插件图标 → 填服务地址(默认 http://127.0.0.1:8300)→ 测试连接 → 保存
+```
+
+之后在任意网页:**选文字 → 右键 → 🌾 织入洞察织机**,系统通知确认,流水线自动开工。
+插件走扩展 host 权限发请求,不受页面 CORS 与私有网络管控(PNA)限制。
+
 ## 项目结构
 
 ```
@@ -118,7 +133,8 @@ curator/
 - [x] **P1c** 检索层:本地向量库(Chroma + 本地 ONNX 嵌入,无需云 API)+ 语义检索 `/api/search` + 链接员语义化 + RAG 问答 `/api/ask`(带引用);审批落盘自动入索引
 - [ ] **P1b** 知识图谱视图(双链可视化)、React 前端重构
 - [x] **P2a** 采集端·书签脚本:工作台生成「🌾 织入织机」按钮,拖到书签栏,任意网页一键投递(选中文字优先);弹窗导航方案,不受 CORS/私有网络管控限制
-- [ ] **P2** 采集端进阶(浏览器插件 → Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
+- [x] **P2b** 采集端·浏览器插件:右键「织入」直达流水线,系统通知确认,popup 可配服务地址(`web_extension/`)
+- [ ] **P2** 采集端进阶(Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
 - [ ] **P3** 本地模型适配(Ollama)、checkpointer 时间旅行、RSS/邮件采集、多用户
 
 ## 发布检查清单
