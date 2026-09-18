@@ -79,6 +79,20 @@ INSIGHTLOOM_LLM_API_KEY=sk-xxx INSIGHTLOOM_LLM_BASE_URL=https://dashscope.aliyun
 INSIGHTLOOM_LLM_MODEL=qwen-plus .venv/bin/uvicorn server.app:app
 ```
 
+## Capture: send any webpage into the pipeline
+
+**Option 1 · Bookmarklet (zero install)**: open the workbench, drag the 「🌾 织入织机」 button to your bookmarks bar; click it on any page — selection (or meta description) + title + URL goes straight to the inbox.
+
+**Option 2 · Browser extension (right-click, recommended)**:
+
+```
+1. Open chrome://extensions → enable "Developer mode"
+2. "Load unpacked" → select the web_extension/ directory in this repo
+3. Click the extension icon → set server URL (default http://127.0.0.1:8300) → Test → Save
+```
+
+Then on any page: **select text → right-click → 🌾 织入洞察织机**. A system notification confirms; the pipeline starts immediately. Requests are sent with extension host permissions — immune to page CORS and Private Network Access restrictions.
+
 ## Project Structure
 
 ```
@@ -113,7 +127,9 @@ curator/
 - [x] **P1a** 🌻 Gardener agent: vault scan for orphan/stale/thin notes, link suggestions through the same approval queue (auto-appends `[[wiki-links]]` on approval) + daily digest page
 - [x] **P1c** Retrieval layer: local vector store (Chroma + local ONNX embeddings, no cloud API) + semantic search `/api/search` + semantic Linker + RAG Q&A `/api/ask` (with citations); approved notes are auto-indexed
 - [ ] **P1b** Knowledge graph view (link visualization), React frontend
-- [ ] **P2** Docker one-command deploy, capture endpoints (bookmarklet → browser extension → Telegram bot), demo GIF, public launch
+- [x] **P2a** Bookmarklet capture: drag-to-bookmarks one-click send (popup navigation, immune to CORS/PNA)
+- [x] **P2b** Browser extension: right-click「织入」, system notification, configurable server URL (`web_extension/`)
+- [ ] **P2** Telegram bot capture, demo GIF, public launch
 - [ ] **P3** Local model support (Ollama), checkpointer time-travel, RSS/email capture, multi-user
 
 ## Launch Checklist

@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<style>
+  body { font-family: system-ui, -apple-system, "PingFang SC", sans-serif; width: 280px; margin: 0; padding: 14px; background: #0f172a; color: #e2e8f0; }
+  h1 { font-size: 14px; margin: 0 0 2px; display: flex; align-items: center; gap: 6px; }
+  p.sub { font-size: 11px; color: #94a3b8; margin: 0 0 12px; }
+  label { font-size: 11px; color: #94a3b8; display: block; margin-bottom: 4px; }
+  input { width: 100%; box-sizing: border-box; padding: 7px 9px; border-radius: 8px; border: 1px solid #334155; background: #1e293b; color: #e2e8f0; font-size: 12px; }
+  .row { display: flex; gap: 8px; margin-top: 10px; }
+  button { flex: 1; padding: 7px 0; border-radius: 8px; border: 0; font-size: 12px; cursor: pointer; }
+  #save { background: #fbbf24; color: #451a03; font-weight: 600; }
+  #test { background: #1e293b; color: #7dd3fc; border: 1px solid #334155; }
+  #status { margin-top: 10px; font-size: 11px; min-height: 15px; color: #94a3b8; }
+  #status.ok { color: #34d399; } #status.err { color: #f87171; }
+</style>
+</head>
+<body>
+  <h1>🌾 洞察织机 · 采集</h1>
+  <p class="sub">在任意网页右键「织入」,内容直接飞进流水线</p>
+  <label for="server">服务地址</label>
+  <input id="server" placeholder="http://127.0.0.1:8300">
+  <div class="row">
+    <button id="test">测试连接</button>
+    <button id="save">保存</button>
+  </div>
+  <div id="status"></div>
+<script>
+const $ = id => document.getElementById(id);
+const DEFAULT_SERVER = "http://127.0.0.1:8300";
+
+chrome.storage.local.get("server").then(({ server }) => { $("server").value = server || DEFAULT_SERVER; });
+
+function setStatus(text, cls) { $("status").textContent = text; $("status").className = cls || ""; }
+
+$("save").onclick = async () => {
+  const v = $("server").value.trim().replace(/\/+$/, "");
+  await chrome.storage.local.set({ server: v || DEFAULT_SERVER });
+  setStatus("已保存 ✓", "ok");
+};
+
+$("test").onclick = async () => {
+  const v = ($("server").value.trim() || DEFAULT_SERVER).replace(/\/+$/, "");
+  setStatus("连接中…");
+  try {
+    const r = await fetch(`${v}/api/health`);
+    const j = await r.json();
+    if (j.ok) setStatus(`连接成功 · ${j.llm.mock ? "MOCK 模式" : "真实模型: " + j.llm.model}`, "ok");
+    else setStatus("服务可达但状态异常", "err");
+  } catch (e) {
+    setStatus(`连不上 ${v} — 服务在跑吗?`, "err");
+  }
+};
+</script>
+</body>
+</html>
