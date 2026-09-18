@@ -8,9 +8,9 @@ services:
       - ./data:/app/data          # SQLite + Chroma 索引 + 嵌入模型缓存
       - ./vault:/app/vault        # 你的知识库(Markdown,宿主机可直接编辑)
     environment:
-      # 默认 MOCK 模式零配置可跑;接真实模型填下面两行
-      - CURATOR_LLM_MOCK=${CURATOR_LLM_MOCK:-1}
-      - CURATOR_LLM_API_KEY=${CURATOR_LLM_API_KEY:-}
-      - CURATOR_LLM_BASE_URL=${CURATOR_LLM_BASE_URL:-}
-      - CURATOR_LLM_MODEL=${CURATOR_LLM_MODEL:-}
+      # 默认 MOCK 模式零配置可跑;接真实模型填 INSIGHTLOOM_LLM_API_KEY(旧前缀 CURATOR_ 也兼容)
+      - INSIGHTLOOM_LLM_MOCK=${INSIGHTLOOM_LLM_MOCK:-${CURATOR_LLM_MOCK:-1}}
+      - INSIGHTLOOM_LLM_API_KEY=${INSIGHTLOOM_LLM_API_KEY:-${CURATOR_LLM_API_KEY:-}}
+      - INSIGHTLOOM_LLM_BASE_URL=${INSIGHTLOOM_LLM_BASE_URL:-${CURATOR_LLM_BASE_URL:-}}
+      - INSIGHTLOOM_LLM_MODEL=${INSIGHTLOOM_LLM_MODEL:-${CURATOR_LLM_MODEL:-}}
     restart: unless-stopped

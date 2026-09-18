@@ -61,22 +61,23 @@ UV_CACHE_DIR=/tmp/uv-cache uv pip install --python .venv/bin/python \
     fastapi "uvicorn[standard]" langgraph langchain-core openai python-dotenv
 
 # MOCK 模式(无需任何 API Key,体验完整流程)
-CURATOR_LLM_MOCK=1 .venv/bin/uvicorn server.app:app --port 8300
+# 环境变量前缀统一为 INSIGHTLOOM_*;旧前缀 CURATOR_* 仍然兼容,存量部署不受影响
+INSIGHTLOOM_LLM_MOCK=1 .venv/bin/uvicorn server.app:app --port 8300
 # 打开 http://127.0.0.1:8300
 
 # 真实模式(DeepSeek,几块钱够用很久)
-CURATOR_LLM_API_KEY=sk-xxx .venv/bin/uvicorn server.app:app --port 8300
+INSIGHTLOOM_LLM_API_KEY=sk-xxx .venv/bin/uvicorn server.app:app --port 8300
 # 或任意 OpenAI 兼容服务:
-CURATOR_LLM_API_KEY=sk-xxx CURATOR_LLM_BASE_URL=https://api.openai.com/v1 \
-CURATOR_LLM_MODEL=gpt-4o-mini .venv/bin/uvicorn server.app:app
+INSIGHTLOOM_LLM_API_KEY=sk-xxx INSIGHTLOOM_LLM_BASE_URL=https://api.openai.com/v1 \
+INSIGHTLOOM_LLM_MODEL=gpt-4o-mini .venv/bin/uvicorn server.app:app
 
 # 免费真实模型(OpenAI 兼容,任选):
 # 智谱 GLM-4-Flash —— 注册即永久免费
-CURATOR_LLM_API_KEY=你的key CURATOR_LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4 \
-CURATOR_LLM_MODEL=glm-4-flash .venv/bin/uvicorn server.app:app
+INSIGHTLOOM_LLM_API_KEY=你的key INSIGHTLOOM_LLM_BASE_URL=https://open.bigmodel.cn/api/paas/v4 \
+INSIGHTLOOM_LLM_MODEL=glm-4-flash .venv/bin/uvicorn server.app:app
 # 阿里云百炼 —— 新用户 7000 万 Token(90 天)
-CURATOR_LLM_API_KEY=sk-xxx CURATOR_LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1 \
-CURATOR_LLM_MODEL=qwen-plus .venv/bin/uvicorn server.app:app
+INSIGHTLOOM_LLM_API_KEY=sk-xxx INSIGHTLOOM_LLM_BASE_URL=https://dashscope.aliyuncs.com/compatible-mode/v1 \
+INSIGHTLOOM_LLM_MODEL=qwen-plus .venv/bin/uvicorn server.app:app
 ```
 
 ## 项目结构

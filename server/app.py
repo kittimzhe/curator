@@ -8,8 +8,9 @@
 - GET  /                        Web UI(静态页)
 
 运行:
-    CURATOR_LLM_MOCK=1 .venv/bin/uvicorn server.app:app --port 8300
-    真实模式:CURATOR_LLM_API_KEY=sk-xxx .venv/bin/uvicorn server.app:app
+    INSIGHTLOOM_LLM_MOCK=1 .venv/bin/uvicorn server.app:app --port 8300
+    真实模式:INSIGHTLOOM_LLM_API_KEY=sk-xxx .venv/bin/uvicorn server.app:app
+    (旧前缀 CURATOR_* 仍然兼容,见 server/config.py)
 """
 
 from __future__ import annotations
@@ -21,7 +22,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-# 启动时加载项目根 .env(如存在),自动注入 CURATOR_LLM_API_KEY 等
+# 启动时加载项目根 .env(如存在),自动注入 INSIGHTLOOM_LLM_API_KEY 等
 try:
     from dotenv import load_dotenv
 

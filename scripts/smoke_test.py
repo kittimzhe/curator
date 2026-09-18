@@ -1,8 +1,8 @@
 """洞察织机(InsightLoom)端到端冒烟测试(MOCK 模式)。
 
-覆盖:健康检查 → 投递 → 五 Agent 流水线 → 审批落盘 → 简报 → 园丁巡库。
+覆盖:健康检查 → 投递 → 五 Agent 流水线 → 审批落盘 → 简报 → 园丁巡库 + 旧前缀兼容自检。
 检索层为可选检查:嵌入模型不可用时自动跳过(检索模块本身设计为优雅降级)。
-用法:CURATOR_LLM_MOCK=1 .venv/bin/python scripts/smoke_test.py
+用法:INSIGHTLOOM_LLM_MOCK=1 .venv/bin/python scripts/smoke_test.py
 退出码 0 = 全部通过。
 """
 
@@ -13,8 +13,15 @@ import sys
 import time
 from pathlib import Path
 
-os.environ["CURATOR_LLM_MOCK"] = "1"
+os.environ["INSIGHTLOOM_LLM_MOCK"] = "1"
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+# 兼容性自检:旧前缀 CURATOR_ 仍可读取(存量部署不中断)
+os.environ["CURATOR_SMOKE_COMPAT"] = "1"
+from server.config import env  # noqa: E402
+
+assert env("SMOKE_COMPAT") == "1", "CURATOR_ 旧前缀兼容失效"
+os.environ.pop("CURATOR_SMOKE_COMPAT")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
