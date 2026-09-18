@@ -366,6 +366,14 @@
       <button onclick="doAsk()" class="btn-secondary">✨ AI 回答</button>
     </div>
     <div id="search-results" class="hidden mt-3 space-y-2"></div>
+    <div class="mt-5 flex flex-wrap items-center gap-2 text-xs">
+      <span class="text-slate-500">📥 一键采集:</span>
+      <a id="bookmarklet-link" href="#" draggable="true"
+         class="px-3 py-1.5 rounded-lg bg-amber-400/90 hover:bg-amber-300 text-amber-950 font-semibold shadow-sm cursor-grab select-none"
+         title="按住拖到浏览器书签栏">🌾 织入织机</a>
+      <button onclick="copyBookmarklet()" class="btn-secondary !py-1 !text-xs">复制脚本</button>
+      <span class="text-slate-400">拖到书签栏后,在任意网页点击,标题 + 选中文字 + 链接直接飞进收件箱</span>
+    </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-5 text-xs">
       <div class="feature-tile">👀 看得见的治理流水线：分类、摘要、互链、审查全流程可视。</div>
       <div class="feature-tile">✅ 人审批才落盘：AI 只提交提案，未经确认不改知识库。</div>
@@ -1001,6 +1009,25 @@ function renderGraphInfo(){
 
 function focusNode(id){ const n = G.byId[id]; if (n) { G.sel = n; renderGraphInfo(); G.alpha = Math.max(G.alpha, 0.2); } }
 
+/* ============ 书签采集(bookmarklet,弹窗导航方案) ============ */
+/* 说明:现代 Chrome 的私有网络管控(PNA)会拦截公网页面向 127.0.0.1 的 fetch,
+   因此用 window.open 顶级导航到 /collect 收件页——不受 CORS/PNA 限制,全浏览器可靠。 */
+function bookmarkletCode(){
+  const origin = location.origin;
+  return `(function(){try{var s=String(window.getSelection()||'');var m=document.querySelector('meta[name="description"]');var c=s||(m&&m.content?m.content:document.body.innerText.slice(0,1500));var q='title='+encodeURIComponent(document.title.slice(0,200))+'&content='+encodeURIComponent(c.slice(0,1500))+'&url='+encodeURIComponent(location.href);var w=window.open('${origin}/collect?'+q,'insightloom_collect','width=380,height=260');if(!w)alert('弹窗被拦截:请允许本站弹窗后重试')}catch(e){alert('脚本异常: '+e)}})()`;
+}
+function initBookmarklet(){
+  const a = document.getElementById('bookmarklet-link');
+  if (a) a.href = 'javascript:' + encodeURIComponent(bookmarkletCode());
+}
+function copyBookmarklet(){
+  const code = 'javascript:' + bookmarkletCode();
+  navigator.clipboard.writeText(decodeURIComponent(code)).then(() => {
+    const b = event?.target; const old = b?.textContent;
+    if (b) { b.textContent = '已复制 ✓ 去书签管理器粘贴'; setTimeout(() => b.textContent = old, 2600); }
+  }).catch(() => alert('复制失败,请手动拖拽按钮到书签栏'));
+}
+
 async function fetchDigest(){
   try {
     const d = await (await fetch('/api/digest')).json();
@@ -1118,6 +1145,7 @@ async function doAsk(){
 
 $('search-q').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); doSearch(); } });
 
+initBookmarklet();
 poll();
 setInterval(poll, 2000);
 </script>

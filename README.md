@@ -117,7 +117,8 @@ curator/
 - [x] **P1a** 🌻 园丁 Agent:巡库检测孤立/过时/薄弱笔记,双链建议走统一审批(批准后自动追加 `[[双链]]` 到既有笔记)+ 每日简报页(24h 统计/标签/健康度)
 - [x] **P1c** 检索层:本地向量库(Chroma + 本地 ONNX 嵌入,无需云 API)+ 语义检索 `/api/search` + 链接员语义化 + RAG 问答 `/api/ask`(带引用);审批落盘自动入索引
 - [ ] **P1b** 知识图谱视图(双链可视化)、React 前端重构
-- [ ] **P2** Docker 一键部署、采集端(bookmarklet → 浏览器插件 → Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
+- [x] **P2a** 采集端·书签脚本:工作台生成「🌾 织入织机」按钮,拖到书签栏,任意网页一键投递(选中文字优先);弹窗导航方案,不受 CORS/私有网络管控限制
+- [ ] **P2** 采集端进阶(浏览器插件 → Telegram bot)、demo GIF、正式发布(V2EX / 掘金 / HN / r/selfhosted)
 - [ ] **P3** 本地模型适配(Ollama)、checkpointer 时间旅行、RSS/邮件采集、多用户
 
 ## 发布检查清单

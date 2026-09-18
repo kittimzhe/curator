@@ -19,6 +19,7 @@ import threading
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
@@ -38,6 +39,25 @@ from . import store
 
 app = FastAPI(title="InsightLoom API", version="0.1.0")
 
+# 书签采集脚本(bookmarklet)在任意网页上向本机服务投递,需要跨域放行。
+# 自托管单人工具,默认仅监听本机;如暴露公网请自行加反代鉴权。
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["GET", "POST"],
+    allow_headers=["*"],
+)
+
+
+@app.middleware("http")
+async def _private_network_access(request, call_next):
+    """Chrome PNA:公网页面(https)的书签脚本访问本机服务,
+    预检要求响应带 Access-Control-Allow-Private-Network: true。"""
+    response = await call_next(request)
+    if request.method == "OPTIONS":
+        response.headers["Access-Control-Allow-Private-Network"] = "true"
+    return response
+
 WEB_DIR = Path(__file__).resolve().parent.parent / "web"
 VAULT_DIR = Path(__file__).resolve().parent.parent / "vault"
 
@@ -54,6 +74,32 @@ def add_item(item: InboxItem):
     row = store.get_item(item_id)
     threading.Thread(target=pipeline.run_pipeline, args=(row,), daemon=True).start()
     return {"id": item_id, "status": "processing"}
+
+
+_COLLECT_PAGE = """<!doctype html><html lang="zh"><head><meta charset="utf-8">
+<title>洞察织机 · 收件</title><style>
+body{{font-family:system-ui,-apple-system,"PingFang SC",sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;background:#0f172a;color:#e2e8f0}}
+.box{{text-align:center;padding:24px}}.ok{{font-size:34px}}h2{{font-size:15px;font-weight:600;margin:10px 0 4px}}
+p{{font-size:12px;color:#94a3b8;margin:0;word-break:break-all}}</style></head>
+<body><div class="box"><div class="ok">🌾</div><h2>{msg}</h2><p>{title}</p>
+<script>setTimeout(function(){{window.close()}},2000)</script></div></body></html>"""
+
+
+@app.get("/collect")
+def collect(title: str = "", content: str = "", url: str = ""):
+    """书签采集脚本的弹窗落点(顶级导航,不受 CORS/私有网络管控限制)。"""
+    title = (title or "未命名采集").strip()[:200]
+    content = (content or "").strip()[:8000]
+    if not content:
+        content = f"(无选中文字,仅链接){url}"
+    item_id = store.create_item(title, content, url)
+    row = store.get_item(item_id)
+    threading.Thread(target=pipeline.run_pipeline, args=(row,), daemon=True).start()
+    from fastapi.responses import HTMLResponse
+
+    return HTMLResponse(
+        _COLLECT_PAGE.format(msg="已织入洞察织机,流水线加工中", title=f"{title} · 条目 #{item_id}")
+    )
 
 
 @app.get("/api/state")
