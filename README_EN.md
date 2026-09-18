@@ -54,6 +54,8 @@ Existing "AI second brain" tools (e.g., khoj) are mostly **passive retrieval**: 
 
 ## Getting Started
 
+> Full walkthrough in the **[User Guide](docs/USER_GUIDE.md)** (Chinese): capture, approval, graph/search/digest, backup & FAQ.
+
 ```bash
 # Requires Python 3.10+ (uv recommended)
 uv venv --python 3.12 .venv
